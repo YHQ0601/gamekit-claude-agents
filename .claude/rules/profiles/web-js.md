@@ -1,5 +1,19 @@
 ---
 description: Thin Web/JS game profile for browser runtimes, package scripts, assets, rendering, input, and browser validation.
+paths:
+  - "package.json"
+  - "src/**/*.js"
+  - "src/**/*.jsx"
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+  - "src/**/*.mjs"
+  - "src/**/*.cjs"
+  - "public/**"
+  - "vite.config.*"
+  - "webpack.config.*"
+  - "tsconfig.json"
+  - "**/*.glsl"
+  - "**/*.wgsl"
 ---
 
 # Web/JS Profile

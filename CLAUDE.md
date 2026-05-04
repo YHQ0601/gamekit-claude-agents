@@ -45,6 +45,7 @@ Claude Code owns the canonical workflow:
 - `.claude/rules/`
 - `.claude/hooks/`
 - `.claude/settings.json`
+- `REVIEW.md` for manual review-only rules.
 
 Codex and opencode files are adapters. When the shared workflow changes, update the adapters intentionally while keeping `.claude/` as the source of truth.
 
@@ -71,6 +72,7 @@ Use:
 - `game-code-worker` for focused implementation in the active engine or runtime.
 - `placeholder-asset-worker` when temporary assets, blockouts, icons, VFX placeholders, UI placeholders, or replacement plans are needed.
 - `game-qa-checker` after code, asset, scene, content, package, or behavior-affecting changes.
+- `code-reviewer` only when the user explicitly asks for code review, PR review, diff review, staged change review, or pre-commit review. This role is read-only, must not implement fixes, and returns risk levels with recommended fix plans.
 - `project-memory-curator` after meaningful tasks, architecture decisions, major file moves, or stale memory risks.
 
 ## Knowledge Policy
@@ -100,6 +102,7 @@ Use:
 - Do not introduce complex abstractions for one-off features.
 - Do not delete assets unless their usage has been checked.
 - Before review or QA, identify changed files, affected systems, active engine profile, and likely serialization/reference/build risks.
+- Code review is manual-only. Do not automatically review every implementation or edit files while reviewing. If the user asks to fix review findings, return to the main development workflow.
 - After code changes, run or propose the smallest relevant verification.
 
 ## Cross-Tool Compatibility

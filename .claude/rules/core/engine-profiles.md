@@ -8,10 +8,13 @@ description: Explain how and when to load thin engine profiles without turning t
 
 Use core rules for all work. Load a profile only when:
 
+- Claude opens or works on files matching a profile's `paths` frontmatter;
 - `docs/ai/PROJECT_BRIEF.md` declares an engine;
 - repository files identify an engine;
 - the user names an engine or engine-specific file type;
 - the task touches engine-specific build, editor, scene, asset, or package behavior.
+
+Profile `paths` are a convenience for Claude's path-specific rule loading. Hooks and adapters should still use the markers below when the engine is known from project files or the user's request.
 
 ## Available Profiles
 

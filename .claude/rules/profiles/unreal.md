@@ -1,5 +1,15 @@
 ---
 description: Thin Unreal profile for C++, Blueprints, assets, maps, modules, plugins, config files, and editor validation.
+paths:
+  - "**/*.uproject"
+  - "Source/**/*.h"
+  - "Source/**/*.cpp"
+  - "Source/**/*.Build.cs"
+  - "Source/**/*.Target.cs"
+  - "Content/**/*.uasset"
+  - "Content/**/*.umap"
+  - "Config/**/*.ini"
+  - "Plugins/**"
 ---
 
 # Unreal Profile

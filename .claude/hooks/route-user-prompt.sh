@@ -64,6 +64,16 @@ detect_engine() {
 }
 
 ENGINE="$(detect_engine)"
+REVIEW_FIX_REQUEST=false
+REVIEW_REQUEST=false
+
+if echo "$PROMPT" | grep -Eqi '(fix|address|resolve|implement|apply|handle|follow up).*(review|comment|finding|feedback|issue|suggestion)|((review|comment|finding|feedback).*(fix|address|resolve|implement|apply|handle|follow up))|(修复|处理|解决|应用).*(review|审查|评审|意见|反馈|问题|finding)|(根据|按照).*(review|审查|评审|意见|反馈|问题|finding).*(修改|修复|处理|解决|应用)'; then
+  REVIEW_FIX_REQUEST=true
+fi
+
+if [ "$REVIEW_FIX_REQUEST" != "true" ] && echo "$PROMPT" | grep -Eqi 'gamekit-review|code review([[:space:]]+(current|this|the|diff|changes|patch|pr|pull request|staged|unstaged))?|review[[:space:]]+(current|this|the)[[:space:]]+(diff|changes|patch|pr|pull request|staged|unstaged)|review[[:space:]]+(staged|unstaged)[[:space:]]+changes|review[[:space:]]+this[[:space:]]+pr|pr review|pull request review|pre-commit review|staged review|审查(当前|这次|本次|diff|PR|pr|改动|修改)|代码审查|评审(当前|这次|本次|diff|PR|pr|改动|修改)'; then
+  REVIEW_REQUEST=true
+fi
 
 case "$(printf '%s' "$ENGINE" | tr '[:upper:]' '[:lower:]')" in
   unity*) add_hint "Detected Unity profile. Load .claude/rules/profiles/unity.md before engine-specific work." ;;
@@ -88,7 +98,7 @@ if echo "$PROMPT" | grep -Eqi 'phaser|three\.?js|pixi|babylon|vite|canvas|webgl|
   add_hint "This looks like Web/JS game work. Use .claude/rules/profiles/web-js.md and consider game-code-worker or game-qa-checker."
 fi
 
-if echo "$PROMPT" | grep -Eqi 'code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|任务|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色'; then
+if [ "$REVIEW_REQUEST" != "true" ] && echo "$PROMPT" | grep -Eqi 'code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|任务|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色'; then
   add_hint "This looks like focused implementation work. Consider gamekit-build and game-code-worker."
 fi
 
@@ -108,7 +118,15 @@ if echo "$PROMPT" | grep -Eqi 'temporary asset|placeholder|blockout|greybox|whit
   add_hint "This includes temporary or replaceable asset work. Consider gamekit-assets and placeholder-asset-worker."
 fi
 
-if echo "$PROMPT" | grep -Eqi 'check|test|validate|verify|verification|review|qa|risk|safe|problem|bug|regression|serialization|missing reference|manual test|playtest|检查|测试|验证|评审|风险|安全|有没有问题|回归|引用丢失|手动测试'; then
+if [ "$REVIEW_REQUEST" = "true" ]; then
+  add_hint "This is an explicit manual review request. Use gamekit-review and code-reviewer; do not edit files during review."
+fi
+
+if [ "$REVIEW_FIX_REQUEST" = "true" ]; then
+  add_hint "This asks to address review feedback. Return to the main development workflow with gamekit-build or game-code-worker; do not use code-reviewer unless the user asks for a new review."
+fi
+
+if echo "$PROMPT" | grep -Eqi 'check|test|validate|verify|verification|qa|risk|safe|problem|bug|regression|serialization|missing reference|manual test|playtest|debug|crash|log|检查|测试|验证|风险|安全|有没有问题|回归|引用丢失|手动测试|调试|排查|崩溃|日志'; then
   add_hint "This asks for verification or risk review. Consider gamekit-check and game-qa-checker."
 fi
 

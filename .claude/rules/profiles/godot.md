@@ -1,5 +1,13 @@
 ---
 description: Thin Godot profile for scenes, resources, scripts, autoloads, export settings, and editor validation.
+paths:
+  - "project.godot"
+  - "addons/**"
+  - "**/*.gd"
+  - "**/*.tscn"
+  - "**/*.tres"
+  - "**/*.res"
+  - "**/*.import"
 ---
 
 # Godot Profile

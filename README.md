@@ -28,6 +28,7 @@ Claude Code 是主流程和事实源。Codex 与 opencode 只是兼容适配层�
 | Need / 需求 | File or Folder / 文件或目录 |
 |---|---|
 | Claude canonical workflow / Claude 主流程 | `CLAUDE.md` |
+| Manual review rules / 手动审查规则 | `REVIEW.md` |
 | Shared tool agreement / 多工具共享约定 | `AGENTS.md` |
 | Rules / 规则 | `.claude/rules/` |
 | Skills / 自动工作流 | `.claude/skills/` |
@@ -75,10 +76,12 @@ Adapter files intentionally repeat small role summaries so each tool can discove
 - `CLAUDE.md`：Claude Code 主 orchestrator 的工作约定。
 - `AGENTS.md`: shared working agreement for Codex, opencode, and other compatible tools.
 - `AGENTS.md`：Codex、opencode 和其他兼容工具的共享工作约定。
+- `REVIEW.md`: manual review-only rules for `gamekit-review`, PR review, and diff review.
+- `REVIEW.md`：`gamekit-review`、PR review 和 diff review 的手动只读审查规则。
 - `.claude/agents/`: Claude project subagents for architecture review, focused game code work, placeholder assets, QA, and project memory.
-- `.claude/agents/`：Claude 项目级 subagents，包括架构评审、游戏代码实现、占位资源、QA 和项目记忆。
-- `.claude/skills/`: canonical reusable workflows for intake, implementation, placeholder assets, validation, and handoff.
-- `.claude/skills/`：主流程 skills，包括任务 intake、功能实现、占位资源、验证和交接。
+- `.claude/agents/`：Claude 项目级 subagents，包括架构评审、代码审查、游戏代码实现、占位资源、QA 和项目记忆。
+- `.claude/skills/`: canonical reusable workflows for intake, implementation, placeholder assets, validation, manual review, and handoff.
+- `.claude/skills/`：主流程 skills，包括任务 intake、功能实现、占位资源、验证、手动审查和交接。
 - `.claude/commands/`: thin slash-command entry points for manually invoking the `gamekit-*` workflows.
 - `.claude/commands/`：轻量斜杠命令入口，用于手动触发 `gamekit-*` 工作流。
 - `.claude/rules/core/`: always-relevant game workflow rules.
@@ -146,14 +149,16 @@ Task flow:
 3. Use `gamekit-build` and `game-code-worker` for focused implementation.
 4. Use `gamekit-assets` and `placeholder-asset-worker` for temporary art/blockout work.
 5. Use `gamekit-check` and `game-qa-checker` after behavior-affecting changes.
-6. Use `gamekit-handoff` and `project-memory-curator` when continuity or memory updates are useful.
+6. Use `gamekit-review` and `code-reviewer` only when the user explicitly asks for review.
+7. Use `gamekit-handoff` and `project-memory-curator` when continuity or memory updates are useful.
 
 1. 需求不明确或包含多个部分时，使用 `gamekit-plan` 分类。
 2. 涉及架构风险时，先使用 `architecture-reviewer`。
 3. 聚焦实现时，使用 `gamekit-build` 和 `game-code-worker`。
 4. 需要临时美术、白盒或占位资源时，使用 `gamekit-assets` 和 `placeholder-asset-worker`。
 5. 影响行为的修改完成后，使用 `gamekit-check` 和 `game-qa-checker`。
-6. 需要跨会话延续或记忆更新时，使用 `gamekit-handoff` 和 `project-memory-curator`。
+6. 只有当用户明确要求 review 时，使用 `gamekit-review` 和 `code-reviewer`。
+7. 需要跨会话延续或记忆更新时，使用 `gamekit-handoff` 和 `project-memory-curator`。
 
 Manual slash commands:
 
@@ -164,11 +169,17 @@ Manual slash commands:
 - `/gamekit-build`: implement the smallest useful game change.
 - `/gamekit-build`：实现最小有用游戏改动。
 - `/gamekit-check`: validate build, runtime, asset/reference, save, and performance risks.
-- `/gamekit-check`：验证构建、运行时、资源引用、存档和性能风险。
+- `/gamekit-check`：验证构建、运行时、资源引用、存档和性能风险，也可用于 debug triage。
 - `/gamekit-assets`: plan or create temporary assets and replacement anchors.
 - `/gamekit-assets`：规划或创建临时资源和替换锚点。
+- `/gamekit-review`: manually review a diff, staged changes, PR patch, or named files; return findings, risk level, fix plan, and validation recommendation without editing.
+- `/gamekit-review`：手动只读审查 diff、staged changes、PR patch 或指定文件；返回 findings、风险等级、修复方案和验证建议。
 - `/gamekit-handoff`: summarize continuity, decisions, next step, and stale facts.
 - `/gamekit-handoff`：总结连续性信息、决策、下一步和需要复查的事实。
+
+`gamekit-review` is manual-only. It should not be triggered automatically after every implementation, and the reviewer must return findings, risk level, recommended fix plan, and validation recommendation to the main development conversation instead of applying fixes.
+
+`gamekit-review` 只手动触发。它不应该在每次实现后自动运行，reviewer 必须把 findings、风险等级、修复方案和验证建议带回主开发会话，而不是直接修复。
 
 Placeholder asset placement:
 
@@ -202,6 +213,8 @@ Core rules are always relevant. Engine profiles are used only when the project d
 
 核心规则始终生效。引擎 profile 只在项目声明或显露某个引擎时使用：
 
+- Claude opens or works on files matched by a profile's `paths` frontmatter; or
+- Claude 打开或处理匹配 profile `paths` frontmatter 的文件；或者
 - `docs/ai/PROJECT_BRIEF.md` has `Engine: Unity`, `Godot`, `Unreal`, or `Web/JS`; or
 - `docs/ai/PROJECT_BRIEF.md` 中写明 `Engine: Unity`、`Godot`、`Unreal` 或 `Web/JS`；或者
 - the repository contains clear engine markers such as `ProjectSettings/`, `project.godot`, `*.uproject`, or `package.json`; or
@@ -221,6 +234,10 @@ Available profiles:
 Profiles are thin by design. They contain safety constraints and validation reminders, not a full duplicate workflow.
 
 Profile 是轻量覆盖层，只包含安全约束和验证提醒，不复制一整套 workflow。
+
+The `paths` metadata helps Claude load engine rules when relevant files are touched. Hooks and adapters still use project markers and `PROJECT_BRIEF.md` so tools that do not support path-scoped rules can follow the same intent.
+
+`paths` 元数据帮助 Claude 在相关文件被触及时加载对应引擎规则。Hooks 和 adapters 仍会使用项目标记与 `PROJECT_BRIEF.md`，让不支持 path-scoped rules 的工具也能遵循同一意图。
 
 ## Tool Entry Points / 不同工具入口
 
@@ -320,7 +337,9 @@ Do not duplicate full workflows per engine or per tool. Add shared behavior to c
 - Claude Code subagents: https://code.claude.com/docs/en/subagents
 - Claude Code skills: https://code.claude.com/docs/en/slash-commands
 - Claude Code hooks: https://code.claude.com/docs/en/hooks
+- Claude Code review: https://code.claude.com/docs/en/code-review
 - Codex AGENTS.md: https://developers.openai.com/codex/guides/agents-md
+- Codex code reviews: https://developers.openai.com/codex/use-cases/github-code-reviews
 - opencode rules: https://opencode.ai/docs/rules
 - opencode agents: https://opencode.ai/docs/agents
 - opencode skills: https://opencode.ai/docs/skills

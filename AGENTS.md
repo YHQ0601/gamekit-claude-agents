@@ -7,6 +7,7 @@ The current repository code is the source of truth. Project knowledge files are 
 ## Tool Entry Points
 
 - Claude Code keeps using `CLAUDE.md`, `.claude/agents/`, `.claude/skills/`, `.claude/commands/`, `.claude/rules/`, and `.claude/hooks/`. Do not change that workflow when adding Codex or opencode support.
+- Manual review should use `REVIEW.md` and `gamekit-review`. Reviewers must return findings, risk level, recommended fix plan, and validation recommendation instead of applying fixes.
 - Codex should read this `AGENTS.md`, use project agents from `.codex/agents/`, and use wrapper skills from `.agents/skills/`.
 - opencode should read this `AGENTS.md`, use project agents from `.opencode/agents/`, and may discover canonical `.claude/skills/` through Claude-compatible skill discovery.
 
@@ -59,6 +60,7 @@ Use these role names consistently across tools:
 - `game-code-worker`: use for focused game implementation, engine scripts, gameplay logic, input handling, UI logic, compile/build fixes, and small refactors.
 - `placeholder-asset-worker`: use when temporary assets, blockouts, placeholder prefabs/scenes/nodes/blueprints, VFX placeholders, UI placeholders, icons, or replacement plans are needed.
 - `game-qa-checker`: use after code, asset, scene, content, package, dependency, or behavior-affecting changes, and when the user asks for verification or risk review. This role must not implement features.
+- `code-reviewer`: use only when the user explicitly asks for code review, PR review, diff review, staged change review, or pre-commit review. This role must not edit files or implement fixes; it returns risk levels and recommended fix plans.
 - `project-memory-curator`: use after meaningful tasks, architecture decisions, major file moves, or stale memory risks. Shared knowledge updates require user approval; local session state may be updated more frequently.
 
 Do not ask the user to manually tag agents unless routing is ambiguous.
@@ -94,6 +96,7 @@ Do not ask the user to manually tag agents unless routing is ambiguous.
 - Do not add packages, plugins, engine modules, or dependencies without approval.
 - Do not delete assets unless their usage has been checked.
 - Before review or QA, identify changed files, affected systems, active engine profile, and likely serialization/reference/build risks.
+- Code review is manual-only. Do not automatically review every implementation or edit files while reviewing. If the user asks to fix review findings, return to the main development workflow.
 - After code changes, run or propose the smallest relevant verification.
 
 ## Compatibility Boundaries

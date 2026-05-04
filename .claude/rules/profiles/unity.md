@@ -1,5 +1,14 @@
 ---
 description: Thin Unity profile for C#, serialized assets, prefabs, scenes, ProjectSettings, packages, and Unity Editor validation.
+paths:
+  - "Assets/**"
+  - "ProjectSettings/**"
+  - "Packages/manifest.json"
+  - "**/*.asmdef"
+  - "**/*.unity"
+  - "**/*.prefab"
+  - "**/*.asset"
+  - "**/*.meta"
 ---
 
 # Unity Profile
