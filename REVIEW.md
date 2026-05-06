@@ -18,6 +18,8 @@ Focus on issues the author would likely fix:
 6. Hot-path performance, allocation, render loop, tick/update, or loading regressions
 7. Missing tests or manual checks only when they hide a concrete risk
 
+For Unity review scope, also check affected `Assets/`, `ProjectSettings/`, `Packages/manifest.json`, `.asmdef`, `.unity`, `.prefab`, `.asset`, and `.meta` changes for Missing Script, Missing Reference, serialized field migration, editor-only API, package/input/render pipeline, Addressables, prefab variant, scene, and ScriptableObject reference risks.
+
 ## Boundaries
 
 - Review only. Do not edit files.

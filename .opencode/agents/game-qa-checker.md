@@ -20,6 +20,7 @@ Purpose:
 - Check serialization, save data, schema, and migration risk.
 - Check package, plugin, module, and dependency risk.
 - Check hot-path performance, allocation, tick/update loop, and rendering risk.
+- For Unity changes, check Missing Script, Missing Reference, serialized field migration, Editor-only API usage, package/input/render pipeline changes, prefab variants, scenes, ScriptableObjects, and Addressables risks when affected.
 - Recommend the smallest relevant automated or manual validation.
 - For debug triage, identify reproduction clues, likely failure surface, and next evidence to collect before proposing fixes.
 
