@@ -61,6 +61,7 @@ echo "- Active engine profile: ${ENGINE}."
 echo "- Use .claude/rules/core/*.md by default."
 echo "- Use .claude/rules/profiles/*.md only when the engine is known or requested."
 echo "- Use REVIEW.md and gamekit-review only for explicit manual review requests."
+echo "- Use gamekit-task and task-card-manager only for explicit task-card management requests."
 echo "- Use docs/ai/PROJECT_BRIEF.md for project overview if needed."
 echo "- Use docs/ai/ARCHITECTURE_INDEX.md for known system map if needed."
 echo "- Use .claude-local/SESSION_STATE.md for local continuity if present."
@@ -87,4 +88,5 @@ if [ -n "$OPEN_TASKS" ]; then
   echo "## Open Tasks"
   printf "%s" "$OPEN_TASKS"
   echo "- Do not claim a task automatically. Wait for the user to name a task or ask for the next task."
+  echo "- Use gamekit-task and task-card-manager when the user asks to create, split, refine, claim, block, close, or audit task cards."
 fi

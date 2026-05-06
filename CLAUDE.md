@@ -73,6 +73,7 @@ Use:
 - `placeholder-asset-worker` when temporary assets, blockouts, icons, VFX placeholders, UI placeholders, or replacement plans are needed.
 - `game-qa-checker` after code, asset, scene, content, package, or behavior-affecting changes.
 - `code-reviewer` only when the user explicitly asks for code review, PR review, diff review, staged change review, or pre-commit review. This role is read-only, must not implement fixes, and returns risk levels with recommended fix plans.
+- `task-card-manager` manually when the user asks to create, split, refine, claim, block, close, or audit task cards under `docs/tasks/`. It writes task cards for later execution and must not implement code.
 - `project-memory-curator` after meaningful tasks, architecture decisions, major file moves, or stale memory risks.
 
 ## Knowledge Policy
@@ -86,6 +87,9 @@ Use:
 ## Task Card Policy
 
 - `docs/tasks/*.md` is the shared task queue.
+- Use `gamekit-task` and `task-card-manager` for manual task-card authoring and queue maintenance.
+- Task-card work prepares executable work orders for later agents or cheaper models; it is not implementation.
+- Task cards should include executor summary, checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation, and execution record sections.
 - Session start may list open tasks, but do not claim or start a task automatically.
 - Claim a task only when the user names a task card or explicitly asks for the next task.
 - When claiming a task, set `Status: In Progress` and fill `Owner Agent` when editing the task card is allowed.

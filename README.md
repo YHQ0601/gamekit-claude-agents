@@ -78,10 +78,10 @@ Adapter files intentionally repeat small role summaries so each tool can discove
 - `AGENTS.md`：Codex、opencode 和其他兼容工具的共享工作约定。
 - `REVIEW.md`: manual review-only rules for `gamekit-review`, PR review, and diff review.
 - `REVIEW.md`：`gamekit-review`、PR review 和 diff review 的手动只读审查规则。
-- `.claude/agents/`: Claude project subagents for architecture review, focused game code work, placeholder assets, QA, and project memory.
-- `.claude/agents/`：Claude 项目级 subagents，包括架构评审、代码审查、游戏代码实现、占位资源、QA 和项目记忆。
-- `.claude/skills/`: canonical reusable workflows for intake, implementation, placeholder assets, validation, manual review, and handoff.
-- `.claude/skills/`：主流程 skills，包括任务 intake、功能实现、占位资源、验证、手动审查和交接。
+- `.claude/agents/`: Claude project subagents for architecture review, code review, task-card management, focused game code work, placeholder assets, QA, and project memory.
+- `.claude/agents/`：Claude 项目级 subagents，包括架构评审、代码审查、任务卡管理、游戏代码实现、占位资源、QA 和项目记忆。
+- `.claude/skills/`: canonical reusable workflows for intake, task-card management, implementation, placeholder assets, validation, manual review, and handoff.
+- `.claude/skills/`：主流程 skills，包括任务 intake、任务卡管理、功能实现、占位资源、验证、手动审查和交接。
 - `.claude/commands/`: thin slash-command entry points for manually invoking the `gamekit-*` workflows.
 - `.claude/commands/`：轻量斜杠命令入口，用于手动触发 `gamekit-*` 工作流。
 - `.claude/rules/core/`: always-relevant game workflow rules.
@@ -152,6 +152,10 @@ Task flow:
 6. Use `gamekit-review` and `code-reviewer` only when the user explicitly asks for review.
 7. Use `gamekit-handoff` and `project-memory-curator` when continuity or memory updates are useful.
 
+Use `gamekit-task` and `task-card-manager` manually when the user wants to create, split, refine, claim, block, close, or audit `docs/tasks/*.md` task cards for later execution.
+
+当用户想创建、拆分、细化、领取、阻塞、关闭或审计 `docs/tasks/*.md` 任务卡以供后续执行时，手动使用 `gamekit-task` 和 `task-card-manager`。
+
 1. 需求不明确或包含多个部分时，使用 `gamekit-plan` 分类。
 2. 涉及架构风险时，先使用 `architecture-reviewer`。
 3. 聚焦实现时，使用 `gamekit-build` 和 `game-code-worker`。
@@ -165,7 +169,9 @@ Manual slash commands:
 手动斜杠命令：
 
 - `/gamekit-plan`: classify scope, necessity, engine profile, and workstreams.
+- `/gamekit-task`: create, split, refine, claim, block, close, or audit task cards under `docs/tasks/` without implementing them.
 - `/gamekit-plan`：分类范围、必要性、引擎 profile 和工作流。
+- `/gamekit-task`：创建、拆分、细化、领取、阻塞、关闭或审计 `docs/tasks/` 下的任务卡，但不实现任务。
 - `/gamekit-build`: implement the smallest useful game change.
 - `/gamekit-build`：实现最小有用游戏改动。
 - `/gamekit-check`: validate build, runtime, asset/reference, save, and performance risks.
@@ -293,6 +299,14 @@ opencode 通过共享约定和项目 agents 跟随主流程：
 Use `docs/templates/TASK_TEMPLATE.md` when creating tasks.
 
 创建任务时使用 `docs/templates/TASK_TEMPLATE.md`。
+
+Use `gamekit-task` and `task-card-manager` for deliberate task-card authoring and queue maintenance. Task-card work prepares executable work orders for later agents or cheaper models; it is not implementation.
+
+需要专门编写或维护任务卡时，手动使用 `gamekit-task` 和 `task-card-manager`。任务卡工作是给后续 agent 或更经济模型准备可执行工单，不是直接实现。
+
+Executor-ready task cards include checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation, and execution records.
+
+可执行任务卡应包含映射到验收标准的复选框子任务、实现备注、执行者权限、停止条件、验证要求和执行记录。
 
 Typical task status flow:
 

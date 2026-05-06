@@ -8,6 +8,7 @@ The current repository code is the source of truth. Project knowledge files are 
 
 - Claude Code keeps using `CLAUDE.md`, `.claude/agents/`, `.claude/skills/`, `.claude/commands/`, `.claude/rules/`, and `.claude/hooks/`. Do not change that workflow when adding Codex or opencode support.
 - Manual review should use `REVIEW.md` and `gamekit-review`. Reviewers must return findings, risk level, recommended fix plan, and validation recommendation instead of applying fixes.
+- Manual task-card management should use `gamekit-task`, `task-card-manager`, `docs/templates/TASK_TEMPLATE.md`, and `docs/tasks/*.md`.
 - Codex should read this `AGENTS.md`, use project agents from `.codex/agents/`, and use wrapper skills from `.agents/skills/`.
 - opencode should read this `AGENTS.md`, use project agents from `.opencode/agents/`, and may discover canonical `.claude/skills/` through Claude-compatible skill discovery.
 
@@ -61,6 +62,7 @@ Use these role names consistently across tools:
 - `placeholder-asset-worker`: use when temporary assets, blockouts, placeholder prefabs/scenes/nodes/blueprints, VFX placeholders, UI placeholders, icons, or replacement plans are needed.
 - `game-qa-checker`: use after code, asset, scene, content, package, dependency, or behavior-affecting changes, and when the user asks for verification or risk review. This role must not implement features.
 - `code-reviewer`: use only when the user explicitly asks for code review, PR review, diff review, staged change review, or pre-commit review. This role must not edit files or implement fixes; it returns risk levels and recommended fix plans.
+- `task-card-manager`: use manually when the user asks to create, split, refine, claim, block, close, or audit task cards under `docs/tasks/`. This role writes task cards for later execution and must not implement code.
 - `project-memory-curator`: use after meaningful tasks, architecture decisions, major file moves, or stale memory risks. Shared knowledge updates require user approval; local session state may be updated more frequently.
 
 Do not ask the user to manually tag agents unless routing is ambiguous.
@@ -70,6 +72,9 @@ Do not ask the user to manually tag agents unless routing is ambiguous.
 `docs/tasks/*.md` is the shared task queue.
 
 - Session start may list open task cards with `Status: Todo`, `Status: In Progress`, or `Status: Blocked`.
+- Use `gamekit-task` and `task-card-manager` for manual task-card authoring and queue maintenance.
+- Task-card work should prepare executable work orders for later agents or cheaper models; it is not implementation.
+- Task cards should include executor summary, checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation, and execution record sections.
 - Do not claim or start a task automatically.
 - Claim a task only when the user names a task card or explicitly asks for the next task.
 - When claiming a task, set `Status: In Progress` and fill `Owner Agent` when editing the task card is allowed.
