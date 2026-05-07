@@ -1,0 +1,4 @@
+interface:
+  display_name: "GameKit Unity YAML Context"
+  short_description: "Summarize Unity YAML files for agent context."
+  default_prompt: "Use $gamekit-unity-yaml-context to summarize this Unity prefab, scene, or asset before reading raw YAML."

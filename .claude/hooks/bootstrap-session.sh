@@ -60,6 +60,9 @@ echo "- Project docs are navigation aids, not guaranteed facts."
 echo "- Active engine profile: ${ENGINE}."
 echo "- Use .claude/rules/core/*.md by default."
 echo "- Use .claude/rules/profiles/*.md only when the engine is known or requested."
+if printf '%s' "$ENGINE" | grep -Eqi '^Unity'; then
+  echo "- For Unity .prefab, .unity, or .asset context, use gamekit-unity-yaml-context before reading full raw YAML."
+fi
 echo "- Use REVIEW.md and gamekit-review only for explicit manual review requests."
 echo "- Use gamekit-task and task-card-manager only for explicit task-card management requests."
 echo "- Use docs/ai/PROJECT_BRIEF.md for project overview if needed."

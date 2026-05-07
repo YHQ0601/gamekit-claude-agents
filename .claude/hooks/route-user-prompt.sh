@@ -90,6 +90,10 @@ if prompt_matches 'unity|c#|csharp|monobehaviour|scriptableobject|prefab|scene|p
   add_hint "This looks like Unity-specific work. Use .claude/rules/profiles/unity.md and consider game-code-worker or game-qa-checker."
 fi
 
+if { prompt_matches '(unity yaml|unity serialized|serialized yaml|serialized (asset|scene|prefab|file)|prefab yaml|scene yaml|asset yaml|prefab file|scene file|asset file|\.prefab|\.unity|\.asset|Unity序列化|Unity 序列化|场景文件|预制体文件|资产文件)' && prompt_matches '(^|[^[:alnum:]_])(read|load|open|view|inspect|summarize|parse|analy[sz]e|understand)([^[:alnum:]_]|$)|读取|加载|打开|查看|看|检查|总结|摘要|解析|分析|理解'; } || { prompt_matches '(^|[^[:alnum:]_])(prefab|scene|asset)([^[:alnum:]_]|$)|预制体|场景|资产' && prompt_matches '(^|[^[:alnum:]_])parse([^[:alnum:]_]|$)|解析'; }; then
+  add_hint "Use gamekit-unity-yaml-context before reading full Unity YAML files."
+fi
+
 if prompt_matches 'godot|gdscript|node|scene tree|\.tscn|\.tres|signal|autoload|project.godot'; then
   add_hint "This looks like Godot-specific work. Use .claude/rules/profiles/godot.md and consider game-code-worker or game-qa-checker."
 fi

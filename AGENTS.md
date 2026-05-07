@@ -9,6 +9,7 @@ The current repository code is the source of truth. Project knowledge files are 
 - Claude Code keeps using `CLAUDE.md`, `.claude/agents/`, `.claude/skills/`, `.claude/commands/`, `.claude/rules/`, and `.claude/hooks/`. Do not change that workflow when adding Codex or opencode support.
 - Manual review should use `REVIEW.md` and `gamekit-review`. Reviewers must return findings, risk level, recommended fix plan, and validation recommendation instead of applying fixes.
 - Manual task-card management should use `gamekit-task`, `task-card-manager`, `docs/templates/TASK_TEMPLATE.md`, and `docs/tasks/*.md`.
+- Unity YAML context work should use `gamekit-unity-yaml-context` before reading full `.prefab`, `.unity`, or `.asset` files.
 - Codex should read this `AGENTS.md`, use project agents from `.codex/agents/`, and use wrapper skills from `.agents/skills/`.
 - opencode should read this `AGENTS.md`, use project agents from `.opencode/agents/`, and may discover canonical `.claude/skills/` through Claude-compatible skill discovery.
 
@@ -89,6 +90,7 @@ Do not ask the user to manually tag agents unless routing is ambiguous.
 - Prefer structured project context before broad scanning: `.claude-local/SESSION_STATE.md`, `docs/ai/PROJECT_BRIEF.md`, `docs/ai/ARCHITECTURE_INDEX.md`, relevant system cards, then targeted files.
 - Read index files, templates, and relevant examples before expanding to broad search.
 - Do not read too many large files before summarizing.
+- For Unity `.prefab`, `.unity`, and `.asset` files, use the canonical `.claude/skills/gamekit-unity-yaml-context/SKILL.md` workflow to generate a compact Markdown summary before reading raw YAML.
 - Use subagents for noisy searches or broad investigation when supported.
 - Keep the main conversation focused on conclusions.
 - Do not paste long logs into final answers.

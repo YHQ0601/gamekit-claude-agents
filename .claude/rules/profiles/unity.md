@@ -52,6 +52,7 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 
 - Do not manually modify `.meta` files unless explicitly required.
 - Do not hand-edit complex `.prefab` or `.unity` YAML unless explicitly approved.
+- When the task is to understand, inspect, summarize, or reduce context cost for `.prefab`, `.unity`, or `.asset` files, use `gamekit-unity-yaml-context` before reading full raw YAML.
 - Treat ScriptableObject assets, prefab variants, scenes, Addressables groups, and package manifests as serialized reference surfaces.
 - Prefer Unity Editor operations, Editor scripts, or controlled prefab generation for serialized assets.
 - Do not modify `ProjectSettings` unless the task explicitly requires it.
