@@ -10,6 +10,7 @@ The current repository code is the source of truth. Project knowledge files are 
 - Manual review should use `REVIEW.md` and `gamekit-review`. Reviewers must return findings, risk level, recommended fix plan, and validation recommendation instead of applying fixes.
 - Manual task-card management should use `gamekit-task`, `task-card-manager`, `docs/templates/TASK_TEMPLATE.md`, and `docs/tasks/*.md`.
 - Unity YAML context work should use `gamekit-unity-yaml-context` before reading full `.prefab`, `.unity`, or `.asset` files.
+- Unity prefab or scene mutation work should use `gamekit-unity-prefab-edit`; use `gamekit-unity-yaml-context` before reading raw serialized YAML.
 - Codex should read this `AGENTS.md`, use project agents from `.codex/agents/`, and use wrapper skills from `.agents/skills/`.
 - opencode should read this `AGENTS.md`, use project agents from `.opencode/agents/`, and may discover canonical `.claude/skills/` through Claude-compatible skill discovery.
 

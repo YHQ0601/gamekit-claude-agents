@@ -86,12 +86,16 @@ case "$(printf '%s' "$ENGINE" | tr '[:upper:]' '[:lower:]')" in
   web*|javascript*|js*) add_hint "Detected Web/JS profile. Load .claude/rules/profiles/web-js.md before engine-specific work." ;;
 esac
 
-if prompt_matches 'unity|c#|csharp|monobehaviour|scriptableobject|prefab|scene|projectsettings|unity editor|\.meta|预制体|场景|组件|脚本'; then
+if prompt_matches 'unity|c#|csharp|monobehaviour|scriptableobject|prefab|\.prefab|\.unity|projectsettings|unity editor|\.meta|预制体|Unity[[:space:]]*场景|组件|脚本'; then
   add_hint "This looks like Unity-specific work. Use .claude/rules/profiles/unity.md and consider game-code-worker or game-qa-checker."
 fi
 
 if { prompt_matches '(unity yaml|unity serialized|serialized yaml|serialized (asset|scene|prefab|file)|prefab yaml|scene yaml|asset yaml|prefab file|scene file|asset file|\.prefab|\.unity|\.asset|Unity序列化|Unity 序列化|场景文件|预制体文件|资产文件)' && prompt_matches '(^|[^[:alnum:]_])(read|load|open|view|inspect|summarize|parse|analy[sz]e|understand)([^[:alnum:]_]|$)|读取|加载|打开|查看|看|检查|总结|摘要|解析|分析|理解'; } || { prompt_matches '(^|[^[:alnum:]_])(prefab|scene|asset)([^[:alnum:]_]|$)|预制体|场景|资产' && prompt_matches '(^|[^[:alnum:]_])parse([^[:alnum:]_]|$)|解析'; }; then
   add_hint "Use gamekit-unity-yaml-context before reading full Unity YAML files."
+fi
+
+if { prompt_matches 'unity[[:space:]]*(scene|prefab|serialized|yaml)|\.prefab|\.unity|(^|[^[:alnum:]_])prefab([^[:alnum:]_]|$)|预制体|Unity[[:space:]]*场景' && prompt_matches '(^|[^[:alnum:]_])(edit|modify|change|update|set|add|remove|delete|rename|wire|rewire|assign|repair|fix|migrate|consolidate)([^[:alnum:]_]|$)|编辑|修改|更新|设置|添加|删除|移除|重命名|绑定|重新绑定|分配|修复|迁移|合并|配置'; }; then
+  add_hint "Use gamekit-unity-prefab-edit for Unity prefab or scene mutation. Use gamekit-unity-yaml-context before reading full Unity YAML."
 fi
 
 if prompt_matches 'godot|gdscript|node|scene tree|\.tscn|\.tres|signal|autoload|project.godot'; then

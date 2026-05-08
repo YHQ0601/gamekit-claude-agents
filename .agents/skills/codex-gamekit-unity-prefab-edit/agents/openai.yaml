@@ -1,0 +1,4 @@
+interface:
+  display_name: "GameKit Unity Prefab/Scene Edit"
+  short_description: "Safely edit Unity prefab and scene serialized references."
+  default_prompt: "Use $codex-gamekit-unity-prefab-edit before modifying Unity .prefab or .unity scene serialized fields, Inspector references, or prefab instance overrides."
