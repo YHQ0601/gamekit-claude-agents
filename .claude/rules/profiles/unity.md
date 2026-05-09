@@ -71,6 +71,18 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 - Keep `Update`, `LateUpdate`, `FixedUpdate`, coroutines, animation callbacks, and render callbacks bounded; avoid avoidable allocations, LINQ churn, string formatting, and scene-wide searches there.
 - Do not use editor-only APIs in player/runtime assemblies unless they are behind editor-only compilation and assembly boundaries.
 
+## Wiring Rules
+
+- Prefer one composition root per feature, prefab, or scene. Put Inspector references there, validate them there, and use it to initialize child systems.
+- Dependencies should flow from the root/coordinator into focused components. Avoid child components holding a broad root/context reference just to fetch unrelated systems.
+- Components should receive only what they need, through explicit `Initialize(...)` methods or narrowly scoped serialized fields. Do not turn context/root objects into service locators.
+- Do not use `SendMessage`, `BroadcastMessage`, reflection, or string method names for core gameplay/application flow. Use typed C# events, explicit references, or interfaces.
+- Event producers own and invoke events. Consumers subscribe/unsubscribe explicitly. Producers should not know about optional UI, debug, analytics, VFX, audio, or presentation consumers.
+- Optional debug/UI/presentation components should consume state and events. Core gameplay should still run if those optional consumers are disabled or removed.
+- When changing Unity serialized fields, either preserve bindings with `FormerlySerializedAs` or explicitly document the required manual prefab/scene rebinds.
+- Avoid hand-editing prefab/scene YAML for wiring unless the task explicitly requires it. Prefer Unity Editor operations or controlled editor scripts for serialized asset changes.
+- After wiring changes, run the smallest compile/build check and inspect affected prefabs/scenes for missing scripts, missing references, and required root assignments.
+
 ## Validation
 
 - Run or recommend the smallest relevant Unity compile, EditMode, PlayMode, or manual Editor check.

@@ -287,8 +287,8 @@ opencode 通过共享约定和项目 agents 跟随主流程：
 - 使用 `.opencode/agents/*.md` 作为角色映射；
 - use canonical `.claude/skills/*/SKILL.md` through Claude-compatible skill discovery when available;
 - 在支持 Claude-compatible skill discovery 时，直接使用 `.claude/skills/*/SKILL.md`；
-- `opencode.json` loads core rules and denies `codex-*` wrapper skills to avoid duplicates.
-- `opencode.json` 加载核心规则，并禁用 `codex-*` wrapper skills，避免重复展示。
+- `opencode.json` loads `CLAUDE.md`, shared core rules, and denies `codex-*` wrapper skills to avoid duplicates.
+- `opencode.json` 加载 `CLAUDE.md` 和共享核心规则，并禁用 `codex-*` wrapper skills，避免重复展示。
 
 ## Task Cards / 任务卡
 

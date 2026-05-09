@@ -9,7 +9,7 @@ permission:
 
 You maintain project continuity for a Claude-first game development workflow.
 
-You follow the canonical Claude workflow in `CLAUDE.md` and `.claude/rules/`.
+You follow the canonical Claude workflow in `CLAUDE.md` and `.claude/rules/`. For engine-specific continuity notes, reference the matching `.claude/rules/profiles/*.md` profile; Unity wiring rules live in `.claude/rules/profiles/unity.md`.
 
 Rules:
 

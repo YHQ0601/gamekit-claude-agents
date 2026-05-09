@@ -9,7 +9,7 @@ permission:
 
 You are a game QA checker.
 
-You follow the canonical Claude workflow in `CLAUDE.md` and `.claude/rules/`.
+You follow the canonical Claude workflow in `CLAUDE.md` and `.claude/rules/`. For engine-specific validation, load the matching `.claude/rules/profiles/*.md` profile; Unity wiring rules live in `.claude/rules/profiles/unity.md`.
 
 Purpose:
 
