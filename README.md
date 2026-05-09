@@ -81,6 +81,7 @@ Adapter files intentionally repeat small role summaries so each tool can discove
 - `.claude/agents/`: Claude project subagents for architecture review, code review, task-card management, focused game code work, placeholder assets, QA, and project memory.
 - `.claude/agents/`：Claude 项目级 subagents，包括架构评审、代码审查、任务卡管理、游戏代码实现、占位资源、QA 和项目记忆。
 - `.claude/skills/`: canonical reusable workflows for intake, task-card management, implementation, placeholder assets, validation, manual review, and handoff.
+- `.claude/skills/gamekit-unity-prefab-edit/`: Unity prefab/scene mutation workflow plus an optional Editor backend template and installer for target Unity projects.
 - `.claude/skills/`：主流程 skills，包括任务 intake、任务卡管理、功能实现、占位资源、验证、手动审查和交接。
 - `.claude/commands/`: thin slash-command entry points for manually invoking the `gamekit-*` workflows.
 - `.claude/commands/`：轻量斜杠命令入口，用于手动触发 `gamekit-*` 工作流。
@@ -182,6 +183,12 @@ Manual slash commands:
 - `/gamekit-review`：手动只读审查 diff、staged changes、PR patch 或指定文件；返回 findings、风险等级、修复方案和验证建议。
 - `/gamekit-handoff`: summarize continuity, decisions, next step, and stale facts.
 - `/gamekit-handoff`：总结连续性信息、决策、下一步和需要复查的事实。
+
+Unity prefab/scene backend:
+
+- `gamekit-unity-prefab-edit` auto-installs `Assets/Editor/AgentTools/PrefabEditTool.cs` into a target Unity project when prefab or scene mutation requires the backend and the file is missing.
+- The installed Editor tool is a project file and should be committed; `.claude-local/unity-agent/` stores local ops/result files and should stay ignored.
+- v1 supports Windows Unity batchmode execution, prefab edits, and low-risk existing-object scene edits. High-risk scene structure, prefab instance override, lighting, navigation, render, baked-data, or broad batch edits are refused with manual Editor steps.
 
 `gamekit-review` is manual-only. It should not be triggered automatically after every implementation, and the reviewer must return findings, risk level, recommended fix plan, and validation recommendation to the main development conversation instead of applying fixes.
 

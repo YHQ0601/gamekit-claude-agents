@@ -95,7 +95,7 @@ if { prompt_matches '(unity yaml|unity serialized|serialized yaml|serialized (as
 fi
 
 if { prompt_matches 'unity[[:space:]]*(scene|prefab|serialized|yaml)|\.prefab|\.unity|(^|[^[:alnum:]_])prefab([^[:alnum:]_]|$)|预制体|Unity[[:space:]]*场景' && prompt_matches '(^|[^[:alnum:]_])(edit|modify|change|update|set|add|remove|delete|rename|wire|rewire|assign|repair|fix|migrate|consolidate)([^[:alnum:]_]|$)|编辑|修改|更新|设置|添加|删除|移除|重命名|绑定|重新绑定|分配|修复|迁移|合并|配置'; }; then
-  add_hint "Use gamekit-unity-prefab-edit for Unity prefab or scene mutation. Use gamekit-unity-yaml-context before reading full Unity YAML."
+  add_hint "Use gamekit-unity-prefab-edit for Unity prefab or scene mutation. Use gamekit-unity-yaml-context before reading full Unity YAML; auto-install the Unity Editor backend if mutation needs it and Assets/Editor/AgentTools/PrefabEditTool.cs is missing."
 fi
 
 if prompt_matches 'godot|gdscript|node|scene tree|\.tscn|\.tres|signal|autoload|project.godot'; then

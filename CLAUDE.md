@@ -105,7 +105,7 @@ Use:
 - Do not add packages, plugins, engine modules, or major dependencies without approval.
 - Do not introduce complex abstractions for one-off features.
 - Do not delete assets unless their usage has been checked.
-- For Unity `.prefab` or `.unity` scene mutation, use `gamekit-unity-prefab-edit`; for read-only YAML context, use `gamekit-unity-yaml-context`.
+- For Unity `.prefab` or `.unity` scene mutation, use `gamekit-unity-prefab-edit`; for read-only YAML context, use `gamekit-unity-yaml-context`. When mutation requires the Unity Editor backend and `Assets/Editor/AgentTools/PrefabEditTool.cs` is missing, install it from the skill template automatically.
 - Before review or QA, identify changed files, affected systems, active engine profile, and likely serialization/reference/build risks.
 - Code review is manual-only. Do not automatically review every implementation or edit files while reviewing. If the user asks to fix review findings, return to the main development workflow.
 - After code changes, run or propose the smallest relevant verification.
