@@ -85,6 +85,9 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 
 ## Validation
 
+- Fast C# compile proxy check: for low-risk ordinary C# script-only changes that do not touch serialized assets, scenes, prefabs, ScriptableObjects, Addressables, `Packages/`, `ProjectSettings/`, `.asmdef`, platform config, serialized fields, Inspector bindings, serialized field migration, or gameplay-flow-sensitive wiring, prefer `dotnet build <solution>.sln --no-restore` as the first sanity check when a root `.sln` exists.
+- Discover the solution at the repository root. Prefer the `.sln` matching the repository directory name; if multiple remain, choose the clearest main project solution and report the choice.
+- Report a passing proxy check only as `C# compile-layer proxy check passed`, never as Unity validation. If it fails, distinguish stale Unity-generated project files or local .NET environment issues from errors in changed source.
 - Run or recommend the smallest relevant Unity compile, EditMode, PlayMode, or manual Editor check.
 - Inspect NullReference, Missing Script, Missing Reference, prefab/scene/ScriptableObject reference, serialized field migration, Addressables, package, input, and render pipeline risks when affected.
 - Use the Profiler or allocation inspection only when the change touches hot paths, loading, rendering, physics, animation, UI rebuilds, or repeated per-frame work.

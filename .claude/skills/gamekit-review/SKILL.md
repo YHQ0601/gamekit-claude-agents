@@ -19,8 +19,9 @@ This workflow is intentionally not automatic. Use it when the user asks for revi
 6. Flag only actionable issues introduced by the reviewed changes.
 7. Prioritize findings by impact and likelihood.
 8. Provide advisory fix plans and validation recommendations.
-9. Do not edit files, apply patches, or execute fixes; return review findings to the main session.
-10. If the review reveals durable project facts, stale assumptions, or shared-knowledge drift, provide a `project-memory-curator` recommendation. Review remains read-only; do not directly edit memory or shared docs during review unless the user explicitly asks for memory maintenance.
+9. For eligible Unity C#-only changes, recommend the Unity profile's `C# compile-layer proxy check` only as a proxy check, not as Unity validation.
+10. Do not edit files, apply patches, or execute fixes; return review findings to the main session.
+11. If the review reveals durable project facts, stale assumptions, or shared-knowledge drift, provide a `project-memory-curator` recommendation. Review remains read-only; do not directly edit memory or shared docs during review unless the user explicitly asks for memory maintenance.
 
 ## Finding Criteria
 

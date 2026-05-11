@@ -16,11 +16,12 @@ Use this as a debug triage workflow when the user reports a bug, crash, missing 
 3. Map affected systems using structured context first.
 4. Check engine-specific asset, scene, content, package, dependency, and reference risks.
 5. Check compile/build, runtime, serialization, save data, and performance risks.
-6. Identify existing or missing test coverage.
-7. Recommend the smallest useful automated or manual validation.
-8. Expand file reading only when the initial risk map is insufficient.
-9. For debug triage, identify reproduction clues, likely failure surface, and next evidence to collect before proposing fixes.
-10. End with a `project-memory-curator` memory update decision when validation, QA, or triage establishes new facts, remaining risks, stale assumptions, or next checks.
+6. For eligible Unity C#-only changes, prefer the Unity profile's `dotnet build <solution>.sln --no-restore` proxy check first, but never treat it as Unity validation.
+7. Identify existing or missing test coverage.
+8. Recommend the smallest useful automated or manual validation.
+9. Expand file reading only when the initial risk map is insufficient.
+10. For debug triage, identify reproduction clues, likely failure surface, and next evidence to collect before proposing fixes.
+11. End with a `project-memory-curator` memory update decision when validation, QA, or triage establishes new facts, remaining risks, stale assumptions, or next checks.
 
 ## Output Format
 

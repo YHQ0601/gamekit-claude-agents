@@ -82,7 +82,7 @@ Source references:
 ## Validation Plan
 
 - TBD
-- For Unity tasks, choose the smallest relevant check: Unity compile, EditMode test, PlayMode test, manual scene/prefab inspection, or Profiler/allocation check when hot paths are affected.
+- For Unity tasks, choose the smallest relevant check: optional `C# compile-layer proxy check` for eligible C#-only changes, Unity compile, EditMode test, PlayMode test, manual scene/prefab inspection, or Profiler/allocation check when hot paths are affected.
 
 ## Close Criteria
 

@@ -20,6 +20,8 @@ Focus on issues the author would likely fix:
 
 For Unity review scope, also check affected `Assets/`, `ProjectSettings/`, `Packages/manifest.json`, `.asmdef`, `.unity`, `.prefab`, `.asset`, and `.meta` changes for Missing Script, Missing Reference, serialized field migration, editor-only API, package/input/render pipeline, Addressables, prefab variant, scene, and ScriptableObject reference risks.
 
+For low-risk Unity C#-only review recommendations, `dotnet build <solution>.sln --no-restore` may be suggested as a `C# compile-layer proxy check`, but not as Unity validation.
+
 ## Boundaries
 
 - Review only. Do not edit files.
