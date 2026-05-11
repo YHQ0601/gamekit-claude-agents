@@ -20,6 +20,7 @@ Use this as a debug triage workflow when the user reports a bug, crash, missing 
 7. Recommend the smallest useful automated or manual validation.
 8. Expand file reading only when the initial risk map is insufficient.
 9. For debug triage, identify reproduction clues, likely failure surface, and next evidence to collect before proposing fixes.
+10. End with a `project-memory-curator` memory update decision when validation, QA, or triage establishes new facts, remaining risks, stale assumptions, or next checks.
 
 ## Output Format
 
@@ -44,3 +45,5 @@ Use this as a debug triage workflow when the user reports a bug, crash, missing 
 ## Debug Triage
 
 ## Pass / Risky / Fail
+
+## Memory Update Decision

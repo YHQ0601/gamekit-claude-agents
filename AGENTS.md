@@ -69,6 +69,17 @@ Use these role names consistently across tools:
 
 Do not ask the user to manually tag agents unless routing is ambiguous.
 
+Use `project-memory-curator` proactively at these checkpoints:
+
+- After completing a meaningful task, especially when code, assets, scenes, prefabs, configuration, workflow files, or task-card status changed.
+- After large changes such as multi-file edits, system boundary changes, directory moves, batch renames, schema/template updates, or workflow changes.
+- Before or after a commit, recording current facts, change summary, validation status, and last useful commit.
+- Before handoff. Run the memory update decision first, then prepare the handoff summary.
+- After git pulls or external syncs that changed key project areas.
+- After architecture decisions, newly stable systems, confirmed engine identity, or major constraints are established.
+- When the user explicitly confirms a design is done, final, approved, fully settled, or says to proceed with that design.
+- When the session becomes long, context may be compacted, or the user asks to continue later, summarize, hand off, or remember something.
+
 ## Task Cards
 
 `docs/tasks/*.md` is the shared task queue.
@@ -85,6 +96,26 @@ Do not ask the user to manually tag agents unless routing is ambiguous.
 - Use `Status: Blocked` with `Blocked Reason` when missing information prevents progress.
 
 `.claude-local/SESSION_STATE.md` is continuity memory, not the source of truth for task status.
+
+## Knowledge Update Policy
+
+- Local session state should be updated aggressively when facts are verified in code or explicitly confirmed by the user.
+- Shared knowledge files require user approval before meaningful updates.
+- Shared knowledge updates should be proposed, not silently applied, for `docs/ai/*`, `docs/systems/*`, `docs/decisions/*`, and skill documentation.
+- User-confirmed designs should be recorded as approved design facts. If a design is not implemented yet, label it as approved but not code-verified.
+
+Suggested `.claude-local/SESSION_STATE.md` sections:
+
+- Current Focus
+- Verified Facts
+- User-Confirmed Decisions
+- Approved Designs
+- Recent Changes
+- Validation Status
+- Open Risks / Stale Facts
+- Unclear / Ask Before Continuing
+- Next Step
+- Last Verified Commit
 
 ## Context Budget
 

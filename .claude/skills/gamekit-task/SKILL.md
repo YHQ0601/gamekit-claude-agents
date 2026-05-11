@@ -18,7 +18,8 @@ Purpose: manage `docs/tasks/*.md` as executable work orders without implementing
 7. Keep every task small enough for a focused executor.
 8. Add executor-ready details: checkbox subtasks, acceptance-criteria mapping, implementation notes, permissions, halt conditions, and validation.
 9. Preserve unknown facts as `TBD`.
-10. Return the changed task files and executor guidance.
+10. When claiming, closing, or blocking a task, run a `project-memory-curator` memory update decision so local session state reflects task status, validation status, and any open questions.
+11. Return the changed task files and executor guidance.
 
 ## Guardrails
 
@@ -29,6 +30,7 @@ Purpose: manage `docs/tasks/*.md` as executable work orders without implementing
 - If the user provides design material from a stronger model, preserve the source in `Source / Design Input` and convert it into executable task cards.
 - If a task is intended for a cheaper model, make ownership, boundaries, validation, and risks explicit.
 - Do not invent systems, files, or engine facts. Use `TBD`, `Open Questions`, or `Halt Conditions` when evidence is missing.
+- Task-card status changes may update `.claude-local/SESSION_STATE.md`, but shared architecture or project knowledge docs still require explicit user approval.
 
 ## Task Card Rules
 
@@ -62,3 +64,5 @@ Unity / Godot / Unreal / Web/JS / Mixed / TBD
 ## Open Questions
 
 ## Validation Needed
+
+## Memory Update Decision
