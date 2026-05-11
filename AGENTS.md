@@ -104,7 +104,7 @@ Use `project-memory-curator` proactively at these checkpoints:
 - Shared knowledge updates should be proposed, not silently applied, for `docs/ai/*`, `docs/systems/*`, `docs/decisions/*`, and skill documentation.
 - User-confirmed designs should be recorded as approved design facts. If a design is not implemented yet, label it as approved but not code-verified.
 
-Suggested `.claude-local/SESSION_STATE.md` sections:
+When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/templates/SESSION_STATE_TEMPLATE.md` as the tracked template. Suggested sections:
 
 - Current Focus
 - Verified Facts

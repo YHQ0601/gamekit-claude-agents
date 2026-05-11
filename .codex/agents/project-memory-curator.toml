@@ -30,7 +30,7 @@ Run after:
 - User confirmation that a design is done, final, approved, fully settled, or ready to proceed.
 - Long sessions, context compaction risk, or user requests to continue later, summarize, hand off, or remember something.
 
-When updating `.claude-local/SESSION_STATE.md`, prefer these sections:
+When creating or updating `.claude-local/SESSION_STATE.md`, use `docs/templates/SESSION_STATE_TEMPLATE.md` as the tracked template and prefer these sections:
 - Current Focus
 - Verified Facts
 - User-Confirmed Decisions
