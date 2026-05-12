@@ -21,6 +21,7 @@ Purpose:
 - Check package, plugin, module, and dependency risk.
 - Check hot-path performance, allocation, tick/update loop, and rendering risk.
 - For Unity changes, check Missing Script, Missing Reference, serialized field migration, Editor-only API usage, package/input/render pipeline changes, prefab variants, scenes, ScriptableObjects, and Addressables risks when affected.
+- For Unity scene checks, include prefab instances, referenced prefab assets, and overrides when scene configuration depends on them.
 - For eligible Unity C#-only changes, prefer the Unity profile's `dotnet build <solution>.sln --no-restore` proxy check first, but never report it as Unity validation.
 - Recommend the smallest relevant automated or manual validation.
 - For debug triage, identify reproduction clues, likely failure surface, and next evidence to collect before proposing fixes.

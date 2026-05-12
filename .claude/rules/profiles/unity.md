@@ -89,5 +89,6 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 - Discover the solution at the repository root. Prefer the `.sln` matching the repository directory name; if multiple remain, choose the clearest main project solution and report the choice.
 - Report a passing proxy check only as `C# compile-layer proxy check passed`, never as Unity validation. If it fails, distinguish stale Unity-generated project files or local .NET environment issues from errors in changed source.
 - Run or recommend the smallest relevant Unity compile, EditMode, PlayMode, or manual Editor check.
+- When checking scene configuration, include prefab instances, referenced prefab assets, overrides, Missing Script, Missing Reference, and stale GUID risks; use `gamekit-unity-yaml-context` for referenced `.prefab` summaries when the scene summary is insufficient.
 - Inspect NullReference, Missing Script, Missing Reference, prefab/scene/ScriptableObject reference, serialized field migration, Addressables, package, input, and render pipeline risks when affected.
 - Use the Profiler or allocation inspection only when the change touches hot paths, loading, rendering, physics, animation, UI rebuilds, or repeated per-frame work.

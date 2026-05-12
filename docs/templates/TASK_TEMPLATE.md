@@ -19,7 +19,7 @@ TBD
 Unity impact, if applicable:
 
 - Scenes:
-- Prefabs:
+- Prefabs / scene instances:
 - ScriptableObjects:
 - Packages / ProjectSettings:
 
