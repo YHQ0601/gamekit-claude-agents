@@ -13,6 +13,18 @@ description: Guide focused game implementation toward simple, engine-aware, test
 - Do not add packages, plugins, engine modules, SDKs, or major dependencies without approval.
 - Before adding a new abstraction, inspect existing local patterns.
 
+## Architecture Quality Gate
+
+For non-trivial implementation, quickly check these lenses before editing and again before final validation:
+
+- Compatibility: Will this touch serialized fields, save data, public APIs, network contracts, asset references, config formats, or existing user workflows?
+- Coupling: Does it add hidden dependencies through globals, singletons, service locators, string lookups, scene-wide searches, or implicit execution order?
+- Stability: What existing behavior could regress, and what should explicitly stay unchanged?
+- Ownership: Which module owns the behavior, data, lifecycle, and validation? Keep gameplay logic, UI, data/config, persistence, and editor tooling responsibilities separate.
+- Testability: Can the change be checked with a small automated test, editor validation, scene/prefab check, or focused manual scenario?
+
+Prefer the smallest design that passes these checks. If a lens exposes meaningful risk, simplify the approach or use `architecture-reviewer` before implementation.
+
 ## Engine Profile
 
 - Identify the active engine or runtime before implementation.
