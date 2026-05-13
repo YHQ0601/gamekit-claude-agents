@@ -111,7 +111,7 @@ if prompt_matches 'phaser|three\.?js|pixi|babylon|vite|canvas|webgl|webgpu|brows
 fi
 
 if prompt_matches 'gamekit-task|task-card-manager|task card|docs/tasks|claim task|close task|split task|refine task|audit task|next task|create task|write task|arrange task|plan task|work order|todo|in progress|blocked|done|任务卡|领取任务|关闭任务|拆分任务|细化任务|审计任务|下一任务|布置任务|创建任务|写任务|制定任务|生成任务|安排任务|规划任务|任务拆分|任务设计|执行工单|工单|待办任务|任务待办|进行中任务|任务进行中|阻塞任务|任务阻塞|标记.*完成|完成.*任务卡|任务卡.*完成|完成.*工单|工单.*完成|已完成任务'; then
-  add_hint "This looks like task-card workflow. Consider gamekit-task and task-card-manager; read docs/templates/TASK_TEMPLATE.md and docs/tasks/*.md, and do not claim a task unless the user explicitly asks."
+  add_hint "This looks like task-card workflow. Consider gamekit-task and task-card-manager; read docs/templates/TASK_TEMPLATE.md and relevant docs/tasks/** task cards, and do not claim a task unless the user explicitly asks."
 fi
 
 if [ "$REVIEW_REQUEST" != "true" ] && prompt_matches 'code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色|完成.*功能|完成.*系统|完成.*菜单|完成.*界面|完成.*UI|完成.*脚本|完成.*代码|完成.*玩法|完成.*关卡|完成.*模块|完成.*组件|任务系统|任务奖励|任务玩法|任务逻辑|任务功能|任务界面|任务UI|任务数据|任务链|任务目标|任务进度|任务追踪|任务完成|任务提交|任务领取|任务触发|任务条件|任务面板|任务脚本|任务管理器|实现.*任务|修复.*任务|添加.*任务|开发.*任务|制作.*任务|任务.*系统|任务.*奖励'; then

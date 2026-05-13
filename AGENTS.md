@@ -8,7 +8,7 @@ The current repository code is the source of truth. Project knowledge files are 
 
 - Claude Code keeps using `CLAUDE.md`, `.claude/agents/`, `.claude/skills/`, `.claude/commands/`, `.claude/rules/`, and `.claude/hooks/`. Do not change that workflow when adding Codex or opencode support.
 - Manual review should use `REVIEW.md` and `gamekit-review`. Reviewers must return findings, risk level, recommended fix plan, and validation recommendation instead of applying fixes.
-- Manual task-card management should use `gamekit-task`, `task-card-manager`, `docs/templates/TASK_TEMPLATE.md`, and `docs/tasks/*.md`.
+- Manual task-card management should use `gamekit-task`, `task-card-manager`, `docs/templates/TASK_TEMPLATE.md`, and parent/child task cards under `docs/tasks/`.
 - Unity YAML context work should use `gamekit-unity-yaml-context` before reading full `.prefab`, `.unity`, or `.asset` files.
 - Unity prefab or scene mutation work should use `gamekit-unity-prefab-edit`; use `gamekit-unity-yaml-context` before reading raw serialized YAML. When mutation requires the Unity Editor backend and `Assets/Editor/AgentTools/PrefabEditTool.cs` is missing, install it from the skill template automatically.
 - Codex should read this `AGENTS.md`, use project agents from `.codex/agents/`, and use wrapper skills from `.agents/skills/`.
@@ -82,12 +82,14 @@ Use `project-memory-curator` proactively at these checkpoints:
 
 ## Task Cards
 
-`docs/tasks/*.md` is the shared task queue.
+`docs/tasks/` is the shared parent/child task queue. Use `vNN-short-milestone-name/README.md` for parent milestones and `vNN-tMM-verb-object.md` for executable child tasks.
 
 - Session start may list open task cards with `Status: Todo`, `Status: In Progress`, or `Status: Blocked`.
 - Use `gamekit-task` and `task-card-manager` for manual task-card authoring and queue maintenance.
 - Task-card work should prepare executable work orders for later agents or cheaper models; it is not implementation.
-- Task cards should include executor summary, checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation, and execution record sections.
+- Parent README files should define the milestone goal, child order, dependencies, phase gates, user confirmation points, shared boundaries, and final validation strategy.
+- Child task cards should include a single-node goal, executor summary, checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation method, and execution record sections.
+- Child task cards should reference the parent README instead of copying long milestone background, and should not lock interfaces or APIs unless code or user requirements already do.
 - Do not claim or start a task automatically.
 - Claim a task only when the user names a task card or explicitly asks for the next task.
 - When claiming a task, set `Status: In Progress` and fill `Owner Agent` when editing the task card is allowed.

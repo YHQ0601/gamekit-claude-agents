@@ -1,145 +1,50 @@
-# Task: [Name]
+# Task Template Guide
 
-Status: Todo
-Owner Agent: TBD
-Created: YYYY-MM-DD
-Started:
-Completed:
+Use this guide when creating or maintaining task cards under `docs/tasks/`.
 
-## Source / Design Input
+## Directory Layout
 
-## Requirement Summary
+Use one directory per larger milestone:
 
-## Goal
+```text
+docs/tasks/vNN-short-milestone-name/
+  README.md
+  vNN-t01-verb-object.md
+  vNN-t02-verb-object.md
+```
 
-## Engine / Runtime
+Naming rules:
 
-TBD
+- Milestone directory: `vNN-short-milestone-name`
+- Parent task: `README.md`
+- Child task: `vNN-tMM-verb-object.md`
 
-Unity impact, if applicable:
+Do not repeat these naming rules inside every task card.
 
-- Scenes:
-- Prefabs / scene instances:
-- ScriptableObjects:
-- Packages / ProjectSettings:
+## Template Choice
 
-## Executor Summary
+- Use `docs/templates/TASK_PARENT_README_TEMPLATE.md` for the milestone README.
+- Use `docs/templates/TASK_CHILD_TEMPLATE.md` for each executable child task.
 
-One or two sentences that let a future executor start without rereading the original conversation.
+Parent README responsibilities:
 
-## Scope
+- Describe the full milestone goal and final player/editor experience.
+- List child task order, dependencies, phase gates, and user confirmation points.
+- Define final validation strategy across Editor checks, play flows, QA scenarios, and failure records.
+- Keep shared guardrails such as scope boundaries, systems not to rebuild, and files or areas not to touch.
 
-## Out of Scope
+Child task responsibilities:
 
-## Suggested Agent / Workstream
+- Focus on one executable node.
+- State the target outcome, deliverables, local guardrails, risks, and validation method.
+- Reference the parent README for shared context instead of copying long background.
+- Avoid locking concrete interfaces, class names, or method signatures unless existing code or the user already requires them.
 
-## File Ownership
+## Task Authoring Rules
 
-Allowed to edit:
-
-- TBD
-
-## Do Not Touch
-
-- TBD
-
-## Related Files
-
-- TBD
-
-## Implementation Notes
-
-Existing pattern:
-
-- TBD
-
-Constraints:
-
-- TBD
-- For Unity tasks, record whether the work touches `.meta`, `.unity`, `.prefab`, `.asset`, `ProjectSettings/`, `Packages/manifest.json`, Addressables, input settings, or render pipeline settings.
-
-Source references:
-
-- TBD
-
-## Workstreams
-
-- Architecture:
-- Code:
-- Placeholder Asset:
-- QA:
-- Knowledge:
-
-## Acceptance Criteria
-
-- [ ] AC1:
-
-## Tasks / Subtasks
-
-- [ ] Task 1 (AC: 1)
-  - [ ] Subtask 1.1
-
-## Validation Plan
-
-- TBD
-- For Unity tasks, choose the smallest relevant check: optional `C# compile-layer proxy check` for eligible C#-only changes, Unity compile, EditMode test, PlayMode test, manual scene/prefab inspection, or Profiler/allocation check when hot paths are affected.
-
-## Close Criteria
-
-- Acceptance criteria are satisfied.
-- Validation plan has been completed or explicitly marked not runnable with a reason.
-- Execution Record is filled.
-
-## Executor Permissions
-
-Allowed task-card updates:
-
-- Tasks / Subtasks checkboxes
-- Execution Record
-- File List
-- Change Log
-- Status, Started, and Completed only when the task policy allows it
-
-Do not update:
-
-- Source / Design Input
-- Requirement Summary
-- Goal
-- Scope
-- Acceptance Criteria
-- Validation Plan
-
-## Halt Conditions
-
-Stop and ask if:
-
-- Required files, systems, or engine/runtime facts are missing.
-- The task requires editing files outside File Ownership.
-- The task requires adding packages, plugins, engine modules, SDKs, or major dependencies.
-- The task may affect save data, networking, economy, serialization, project settings, or asset references beyond the documented scope.
-- For Unity tasks, the work requires modifying `ProjectSettings/`, `Packages/manifest.json`, complex `.prefab` or `.unity` YAML, Addressables configuration, input/render pipeline settings, or many `.meta` files.
-
-## Blocked Reason
-
-## Risks
-
-## Open Questions
-
-## Execution Record
-
-Agent Model:
-Started:
-Checks Run:
-Files Changed:
-Completion Notes:
-Issues Encountered:
-
-## File List
-
-- TBD
-
-## Change Log
-
-- YYYY-MM-DD: Created.
-
-## Next Step
+- Task cards guide agents away from scope drift; they are not full technical designs.
+- Coding tasks should describe behavior, existing systems to integrate with, and what must not break.
+- Placeholder or art tasks can be more specific about visible output, naming, hierarchy, color, state feedback, and replacement standards.
+- QA tasks should state how to run the check, what to observe, and what to record on failure.
+- If implementation depth is unclear, require the executor to ask whether the user wants a basic, complete, or expanded version.
+- Preserve unknown project facts as `TBD`, `Open Questions`, or `Halt Conditions`.

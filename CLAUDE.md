@@ -112,10 +112,12 @@ When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/template
 
 ## Task Card Policy
 
-- `docs/tasks/*.md` is the shared task queue.
+- `docs/tasks/` is the shared parent/child task queue. Use `vNN-short-milestone-name/README.md` for parent milestones and `vNN-tMM-verb-object.md` for executable child tasks.
 - Use `gamekit-task` and `task-card-manager` for manual task-card authoring and queue maintenance.
 - Task-card work prepares executable work orders for later agents or cheaper models; it is not implementation.
-- Task cards should include executor summary, checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation, and execution record sections.
+- Parent README files should define the milestone goal, child order, dependencies, phase gates, user confirmation points, shared boundaries, and final validation strategy.
+- Child task cards should include a single-node goal, executor summary, checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation method, and execution record sections.
+- Child task cards should reference the parent README instead of copying long milestone background, and should not lock interfaces or APIs unless code or user requirements already do.
 - Session start may list open tasks, but do not claim or start a task automatically.
 - Claim a task only when the user names a task card or explicitly asks for the next task.
 - When claiming a task, set `Status: In Progress` and fill `Owner Agent` when editing the task card is allowed.

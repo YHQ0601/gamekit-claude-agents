@@ -153,9 +153,9 @@ Task flow:
 6. Use `gamekit-review` and `code-reviewer` only when the user explicitly asks for review.
 7. Use `gamekit-handoff` and `project-memory-curator` when continuity or memory updates are useful.
 
-Use `gamekit-task` and `task-card-manager` manually when the user wants to create, split, refine, claim, block, close, or audit `docs/tasks/*.md` task cards for later execution.
+Use `gamekit-task` and `task-card-manager` manually when the user wants to create, split, refine, claim, block, close, or audit parent/child task cards under `docs/tasks/` for later execution.
 
-当用户想创建、拆分、细化、领取、阻塞、关闭或审计 `docs/tasks/*.md` 任务卡以供后续执行时，手动使用 `gamekit-task` 和 `task-card-manager`。
+当用户想创建、拆分、细化、领取、阻塞、关闭或审计 `docs/tasks/` 下的父子任务卡以供后续执行时，手动使用 `gamekit-task` 和 `task-card-manager`。
 
 1. 需求不明确或包含多个部分时，使用 `gamekit-plan` 分类。
 2. 涉及架构风险时，先使用 `architecture-reviewer`。
@@ -299,21 +299,21 @@ opencode 通过共享约定和项目 agents 跟随主流程：
 
 ## Task Cards / 任务卡
 
-`docs/tasks/*.md` is the lightweight shared task queue. New sessions may list open task cards when their status is `Todo`, `In Progress`, or `Blocked`, but agents should not claim or start a task automatically.
+`docs/tasks/` is the lightweight shared parent/child task queue. Milestones live at `docs/tasks/vNN-short-milestone-name/README.md`, and executable child tasks live beside them as `vNN-tMM-verb-object.md`. New sessions may list open task cards when their status is `Todo`, `In Progress`, or `Blocked`, but agents should not claim or start a task automatically.
 
-`docs/tasks/*.md` 是轻量共享任务队列。新会话可以列出状态为 `Todo`、`In Progress` 或 `Blocked` 的任务卡，但 agent 不应该自动领取或开始任务。
+`docs/tasks/` 是轻量共享父子任务队列。大版本父任务位于 `docs/tasks/vNN-short-milestone-name/README.md`，可执行子任务与它同目录，命名为 `vNN-tMM-verb-object.md`。新会话可以列出状态为 `Todo`、`In Progress` 或 `Blocked` 的任务卡，但 agent 不应该自动领取或开始任务。
 
-Use `docs/templates/TASK_TEMPLATE.md` when creating tasks.
+Use `docs/templates/TASK_TEMPLATE.md` to choose the parent README or child task template when creating tasks.
 
-创建任务时使用 `docs/templates/TASK_TEMPLATE.md`。
+创建任务时使用 `docs/templates/TASK_TEMPLATE.md` 选择父任务 README 模板或子任务模板。
 
 Use `gamekit-task` and `task-card-manager` for deliberate task-card authoring and queue maintenance. Task-card work prepares executable work orders for later agents or cheaper models; it is not implementation.
 
 需要专门编写或维护任务卡时，手动使用 `gamekit-task` 和 `task-card-manager`。任务卡工作是给后续 agent 或更经济模型准备可执行工单，不是直接实现。
 
-Executor-ready task cards include checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation, and execution records.
+Parent README files define milestone goals, child order, phase gates, shared boundaries, and final validation. Executor-ready child task cards include a single-node goal, checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation method, and execution records.
 
-可执行任务卡应包含映射到验收标准的复选框子任务、实现备注、执行者权限、停止条件、验证要求和执行记录。
+父任务 README 定义大版本目标、子任务顺序、阶段门、共享边界和最终验收。可执行子任务卡应包含单节点目标、映射到验收标准的复选框子任务、实现备注、执行者权限、停止条件、验证方式和执行记录。
 
 Typical task status flow:
 

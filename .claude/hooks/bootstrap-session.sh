@@ -85,7 +85,7 @@ while IFS= read -r task_file; do
 "
   fi
 done <<EOF
-$(find docs/tasks -maxdepth 1 -type f -name '*.md' ! -name '.gitkeep' 2>/dev/null | sort || true)
+$(find docs/tasks -type f -name '*.md' ! -name '.gitkeep' 2>/dev/null | sort || true)
 EOF
 
 if [ -n "$OPEN_TASKS" ]; then
