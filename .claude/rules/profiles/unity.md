@@ -66,6 +66,7 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 - Be careful when renaming serialized fields; use a migration strategy such as `FormerlySerializedAs` when serialized data must survive the rename.
 - Prefer ScriptableObject or existing config patterns for skills, items, characters, levels, and balance data.
 - Do not store runtime combat state in ScriptableObjects unless the project already does so intentionally.
+- For Unity UI, prefer authored prefabs or scene UI hierarchies with `[SerializeField] private` references over building full UI layouts at runtime. Runtime code may update state, bind events, toggle visibility, and instantiate known item or row prefabs into existing containers, but should not construct the primary UI structure from scratch unless explicitly requested or already established by the project.
 - Avoid fragile runtime scene/UI wiring such as `GameObject.Find(...)`, `transform.Find(...)`, `GetComponent("...")`, and repeated scene-wide discovery.
 - Cache type-safe `GetComponent<T>()` calls when they are repeated or used from hot paths.
 - Keep `Update`, `LateUpdate`, `FixedUpdate`, coroutines, animation callbacks, and render callbacks bounded; avoid avoidable allocations, LINQ churn, string formatting, and scene-wide searches there.
