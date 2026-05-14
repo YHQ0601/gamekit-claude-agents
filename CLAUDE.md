@@ -66,6 +66,21 @@ If the engine is unknown, inspect the repository and `docs/ai/PROJECT_BRIEF.md` 
 
 Do not ask the user to manually tag agents unless routing is ambiguous.
 
+Workflow routing:
+
+- Use `gamekit-plan` for ambiguous or multi-part requests before implementation. It should include a compact engineering preflight and decide whether subagents are useful.
+- Use `gamekit-ask` for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability.
+- Use `gamekit-check` after behavior-affecting changes or for debug triage. It validates risks but does not implement fixes.
+- Use `gamekit-review` only for explicit review requests. It is read-only and findings-first.
+
+Subagent flow:
+
+- The main agent remains the orchestrator. Simple work should stay local.
+- Use subagents automatically only when the active tool supports them and the user's request already authorizes that kind of work.
+- `gamekit-plan` may route to `architecture-reviewer`, `game-code-worker`, `placeholder-asset-worker`, `game-qa-checker`, or `task-card-manager`.
+- `gamekit-ask` usually uses no subagent; serious architecture tradeoffs may use or recommend read-only `architecture-reviewer`.
+- `gamekit-check` may use `game-qa-checker`; `gamekit-review` may use `code-reviewer` only for explicit review.
+
 Use:
 
 - `architecture-reviewer` before changes affecting architecture, gameplay system boundaries, data models, save data, economy, networking, performance, extensibility, or long-term maintainability.

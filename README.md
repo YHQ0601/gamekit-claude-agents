@@ -80,7 +80,7 @@ Adapter files intentionally repeat small role summaries so each tool can discove
 - `REVIEW.md`：`gamekit-review`、PR review 和 diff review 的手动只读审查规则。
 - `.claude/agents/`: Claude project subagents for architecture review, code review, task-card management, focused game code work, placeholder assets, QA, and project memory.
 - `.claude/agents/`：Claude 项目级 subagents，包括架构评审、代码审查、任务卡管理、游戏代码实现、占位资源、QA 和项目记忆。
-- `.claude/skills/`: canonical reusable workflows for intake, task-card management, implementation, placeholder assets, validation, manual review, and handoff.
+- `.claude/skills/`: canonical reusable workflows for planning, engineering consultation, task-card management, implementation, placeholder assets, validation, manual review, and handoff.
 - `.claude/skills/gamekit-unity-prefab-edit/`: Unity prefab/scene mutation workflow plus an optional Editor backend template and installer for target Unity projects.
 - `.claude/skills/`：主流程 skills，包括任务 intake、任务卡管理、功能实现、占位资源、验证、手动审查和交接。
 - `.claude/commands/`: thin slash-command entry points for manually invoking the `gamekit-*` workflows.
@@ -145,13 +145,14 @@ Task flow:
 
 任务流程：
 
-1. Classify the request with `gamekit-plan` when the task is ambiguous or multi-part.
-2. Use `architecture-reviewer` before architecture-sensitive work.
-3. Use `gamekit-build` and `game-code-worker` for focused implementation.
-4. Use `gamekit-assets` and `placeholder-asset-worker` for temporary art/blockout work.
-5. Use `gamekit-check` and `game-qa-checker` after behavior-affecting changes.
-6. Use `gamekit-review` and `code-reviewer` only when the user explicitly asks for review.
-7. Use `gamekit-handoff` and `project-memory-curator` when continuity or memory updates are useful.
+1. Classify ambiguous or multi-part requests with `gamekit-plan`; include a compact engineering preflight and subagent decision.
+2. Use `gamekit-ask` for read-only engineering consultation before implementation when approach, architecture, compatibility, coupling, stability, performance, production method, or testability needs more thought.
+3. Use `architecture-reviewer` before architecture-sensitive work.
+4. Use `gamekit-build` and `game-code-worker` for focused implementation.
+5. Use `gamekit-assets` and `placeholder-asset-worker` for temporary art/blockout work.
+6. Use `gamekit-check` and `game-qa-checker` after behavior-affecting changes or for debug triage.
+7. Use `gamekit-review` and `code-reviewer` only when the user explicitly asks for review.
+8. Use `gamekit-handoff` and `project-memory-curator` when continuity or memory updates are useful.
 
 Use `gamekit-task` and `task-card-manager` manually when the user wants to create, split, refine, claim, block, close, or audit parent/child task cards under `docs/tasks/` for later execution.
 
@@ -169,17 +170,18 @@ Manual slash commands:
 
 手动斜杠命令：
 
-- `/gamekit-plan`: classify scope, necessity, engine profile, and workstreams.
+- `/gamekit-plan`: classify goal and scope, run a compact engineering preflight, choose the smallest useful slice, and decide workstreams/subagents.
+- `/gamekit-ask`: compare implementation approaches and engineering tradeoffs before editing files.
 - `/gamekit-task`: create, split, refine, claim, block, close, or audit task cards under `docs/tasks/` without implementing them.
 - `/gamekit-plan`：分类范围、必要性、引擎 profile 和工作流。
 - `/gamekit-task`：创建、拆分、细化、领取、阻塞、关闭或审计 `docs/tasks/` 下的任务卡，但不实现任务。
 - `/gamekit-build`: implement the smallest useful game change.
 - `/gamekit-build`：实现最小有用游戏改动。
-- `/gamekit-check`: validate build, runtime, asset/reference, save, and performance risks.
+- `/gamekit-check`: summarize changed area, risk matrix, recommended validation, and result after behavior-affecting changes or debug triage.
 - `/gamekit-check`：验证构建、运行时、资源引用、存档和性能风险，也可用于 debug triage。
 - `/gamekit-assets`: plan or create temporary assets and replacement anchors.
 - `/gamekit-assets`：规划或创建临时资源和替换锚点。
-- `/gamekit-review`: manually review a diff, staged changes, PR patch, or named files; return findings, risk level, fix plan, and validation recommendation without editing.
+- `/gamekit-review`: manually review a diff, staged changes, PR patch, or named files; return findings, risk level, fix plan, validation recommendation, and overall correctness without editing.
 - `/gamekit-review`：手动只读审查 diff、staged changes、PR patch 或指定文件；返回 findings、风险等级、修复方案和验证建议。
 - `/gamekit-handoff`: summarize continuity, decisions, next step, and stale facts.
 - `/gamekit-handoff`：总结连续性信息、决策、下一步和需要复查的事实。

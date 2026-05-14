@@ -57,11 +57,7 @@ Use `[P0]`, `[P1]`, `[P2]`, or `[P3]` prefixes.
 
 Low / Medium / High / Critical
 
-## Active Engine Profile
-
-Unity / Godot / Unreal / Web/JS / Mixed / TBD
-
-## Review Scope
+## Review Scope / Engine
 
 ## Recommended Fix Plan
 

@@ -146,6 +146,10 @@ if prompt_matches 'handoff|summary|summarize|continue later|session state|memory
   add_hint "This looks like continuity or project memory work. Consider gamekit-handoff and project-memory-curator."
 fi
 
+if [ "$REVIEW_REQUEST" != "true" ] && prompt_matches 'gamekit-ask|engineering consultation|implementation approach|implementation strategy|better implementation|safer implementation|production method|tradeoff|trade-off|compatibility|coupling|stability|testability|how to make this stable|more stable|more maintainable'; then
+  add_hint "This looks like pre-implementation engineering consultation. Consider gamekit-ask; use gamekit-plan when scope, workstreams, or start decision are still unclear."
+fi
+
 if [ "${#HINTS[@]}" -gt 0 ]; then
   echo "## Auto Routing Hints"
   for hint in "${HINTS[@]}"; do

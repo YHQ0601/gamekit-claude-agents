@@ -59,6 +59,21 @@ If multiple engines are present, treat it as a mixed project and scope changes t
 
 Use these role names consistently across tools:
 
+Workflow routing:
+
+- `gamekit-plan`: use before ambiguous or multi-part implementation work. It should include a compact engineering preflight and decide whether subagents are useful.
+- `gamekit-ask`: use for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability.
+- `gamekit-check`: use after behavior-affecting changes or for debug triage. It validates risks but does not implement fixes.
+- `gamekit-review`: use only for explicit review requests. It remains read-only and findings-first.
+
+Subagent flow:
+
+- The main agent remains the orchestrator. Simple work should stay local.
+- Use subagents automatically only when the active tool supports them and the user's request already authorizes that kind of work.
+- `gamekit-plan` may route to `architecture-reviewer`, `game-code-worker`, `placeholder-asset-worker`, `game-qa-checker`, or `task-card-manager`.
+- `gamekit-ask` usually uses no subagent; serious architecture tradeoffs may use or recommend read-only `architecture-reviewer`.
+- `gamekit-check` may use `game-qa-checker`; `gamekit-review` may use `code-reviewer` only for explicit review.
+
 - `architecture-reviewer`: use before implementation when work may affect architecture, gameplay system boundaries, data models, save data, economy, networking, performance, extensibility, or long-term maintainability. This role must not edit files.
 - `game-code-worker`: use for focused game implementation, engine scripts, gameplay logic, input handling, UI logic, compile/build fixes, and small refactors.
 - `placeholder-asset-worker`: use when temporary assets, blockouts, placeholder prefabs/scenes/nodes/blueprints, VFX placeholders, UI placeholders, icons, or replacement plans are needed.

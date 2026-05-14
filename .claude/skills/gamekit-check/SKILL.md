@@ -22,30 +22,25 @@ Use this as a debug triage workflow when the user reports a bug, crash, missing 
 9. Recommend the smallest useful automated or manual validation.
 10. Expand file reading only when the initial risk map is insufficient.
 11. For debug triage, identify reproduction clues, likely failure surface, and next evidence to collect before proposing fixes.
-12. End with a `project-memory-curator` memory update decision when validation, QA, or triage establishes new facts, remaining risks, stale assumptions, or next checks.
+12. Do not implement fixes. If fixes are needed, return control to the main implementation workflow.
+13. End with a `project-memory-curator` memory update decision when validation, QA, or triage establishes new facts, remaining risks, stale assumptions, or next checks.
 
 ## Output Format
 
-## Changed Area
-
-## Active Engine Profile
+## Changed Area / Engine
 
 ## Affected Systems
 
-## Engine / Asset Risks
+## Risk Matrix
 
-## Serialization / Save Risks
+Cover engine/assets/references, build/package, serialization/save, runtime, performance, and test coverage.
 
-## Runtime Risks
+## Recommended Validation
 
-## Performance Risks
+Include automated checks, manual checks, and debug triage only when relevant.
 
-## Test Recommendation
+## Result
 
-## Manual Checks
-
-## Debug Triage
-
-## Pass / Risky / Fail
+Pass / Risky / Fail
 
 ## Memory Update Decision

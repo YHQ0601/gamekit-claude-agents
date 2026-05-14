@@ -50,9 +50,7 @@ When used as a local review workflow, report:
 
 Low / Medium / High / Critical
 
-## Active Engine Profile
-
-## Review Scope
+## Review Scope / Engine
 
 ## Recommended Fix Plan
 
@@ -65,3 +63,5 @@ Advisory only. Do not implement fixes.
 ## Overall Correctness
 
 Patch is correct / Patch is risky / Patch is incorrect
+
+## Memory / Knowledge Recommendation
