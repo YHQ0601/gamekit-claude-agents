@@ -15,7 +15,7 @@ Purpose: decide the safest small implementation path before work starts.
 4. Run a compact engineering preflight: compatibility, coupling, stability/regression, performance, production cost, and testability.
 5. Identify the smallest useful slice.
 6. Choose required workstreams and decide whether subagents are useful. Simple work should stay local.
-7. If risks are high or several implementation approaches are close, use `gamekit-ask` or read-only `architecture-reviewer` before implementation.
+7. If risks are high, several approaches are close, or the approach depends on third-party APIs, plugins, performance conventions, or uncertain architecture practice, use `gamekit-ask` for evidence-backed consultation or read-only `architecture-reviewer` before implementation.
 8. Decide whether implementation should start or whether user input is needed.
 
 ## Output Format
