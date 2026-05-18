@@ -69,7 +69,7 @@ Do not ask the user to manually tag agents unless routing is ambiguous.
 Workflow routing:
 
 - Use `gamekit-plan` for ambiguous or multi-part requests before implementation. It should include a compact engineering preflight and decide whether subagents are useful.
-- Use `gamekit-ask` for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability.
+- Use `gamekit-ask` for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability. Use its Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed advice.
 - Use `gamekit-check` after behavior-affecting changes or for debug triage. It validates risks but does not implement fixes.
 - Use `gamekit-review` only for explicit review requests. It is read-only and findings-first.
 

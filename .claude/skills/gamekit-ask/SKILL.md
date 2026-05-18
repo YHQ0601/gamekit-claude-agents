@@ -9,6 +9,8 @@ Purpose: answer engineering implementation questions before code is changed.
 
 Use this workflow when the user wants better thinking about implementation shape, architecture, performance, coupling, compatibility, stability, production method, or testability. Keep the answer compact and practical.
 
+Research Mode: when the user explicitly asks for online search, official guidance, community recommendations, best practices, reference material, latest/current practice, or says not to rely only on model memory, evidence lookup is required before answering.
+
 ## Workflow
 
 1. Restate the engineering question.
@@ -23,6 +25,7 @@ Use this workflow when the user wants better thinking about implementation shape
 ## Boundaries
 
 - Read-only by default. Do not edit code, assets, task cards, project memory, or shared docs.
+- Evidence lookup is not permission to implement. If implementation is also requested, answer the consultation first, then route back to `gamekit-build`.
 - Do not perform diff review. Use `gamekit-review` for explicit review requests.
 - Do not perform post-change validation. Use `gamekit-check` for verification, QA, debug triage, or risk review after changes.
 - Do not turn the answer into a full design document unless the user asks for one.

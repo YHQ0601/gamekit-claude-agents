@@ -102,7 +102,7 @@ if prompt_matches 'godot|gdscript|node|scene tree|\.tscn|\.tres|signal|autoload|
   add_hint "This looks like Godot-specific work. Use .claude/rules/profiles/godot.md and consider game-code-worker or game-qa-checker."
 fi
 
-if prompt_matches 'unreal|ue5|ue4|blueprint|uasset|umap|uproject|uclass|uproperty|uobject|module|plugin'; then
+if prompt_matches 'unreal|ue5|ue4|blueprint|uasset|umap|uproject|uclass|uproperty|uobject|(unreal|ue[45]).*(module|plugin)|(module|plugin).*(unreal|ue[45])'; then
   add_hint "This looks like Unreal-specific work. Use .claude/rules/profiles/unreal.md and consider game-code-worker or game-qa-checker."
 fi
 
@@ -114,7 +114,7 @@ if prompt_matches 'gamekit-task|task-card-manager|task card|docs/tasks|claim tas
   add_hint "This looks like task-card workflow. Consider gamekit-task and task-card-manager; read docs/templates/TASK_TEMPLATE.md and relevant docs/tasks/** task cards, and do not claim a task unless the user explicitly asks."
 fi
 
-if [ "$REVIEW_REQUEST" != "true" ] && prompt_matches 'code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色|完成.*功能|完成.*系统|完成.*菜单|完成.*界面|完成.*UI|完成.*脚本|完成.*代码|完成.*玩法|完成.*关卡|完成.*模块|完成.*组件|任务系统|任务奖励|任务玩法|任务逻辑|任务功能|任务界面|任务UI|任务数据|任务链|任务目标|任务进度|任务追踪|任务完成|任务提交|任务领取|任务触发|任务条件|任务面板|任务脚本|任务管理器|实现.*任务|修复.*任务|添加.*任务|开发.*任务|制作.*任务|任务.*系统|任务.*奖励'; then
+if [ "$REVIEW_REQUEST" != "true" ] && prompt_matches 'implement[[:space:]]+(this|the|a|an)?[[:space:]]*(feature|change|system|mechanic|ui)|code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色|完成.*功能|完成.*系统|完成.*菜单|完成.*界面|完成.*UI|完成.*脚本|完成.*代码|完成.*玩法|完成.*关卡|完成.*模块|完成.*组件|任务系统|任务奖励|任务玩法|任务逻辑|任务功能|任务界面|任务UI|任务数据|任务链|任务目标|任务进度|任务追踪|任务完成|任务提交|任务领取|任务触发|任务条件|任务面板|任务脚本|任务管理器|实现.*任务|修复.*任务|添加.*任务|开发.*任务|制作.*任务|任务.*系统|任务.*奖励'; then
   add_hint "This looks like focused implementation work. Consider gamekit-build and game-code-worker."
 fi
 
@@ -142,11 +142,36 @@ if prompt_matches 'check|test|validate|verify|verification|qa|risk|safe|problem|
   add_hint "This asks for verification or risk review. Consider gamekit-check and game-qa-checker."
 fi
 
-if prompt_matches 'handoff|summary|summarize|continue later|session state|memory|document decision|adr|what changed|next step|stale|交接|总结|下次继续|会话状态|记忆|记录决策|决策记录|改了什么|下一步|过期信息'; then
+if prompt_matches 'handoff|summary|summarize|continue later|session state|project memory|memory update|update memory|remember this|document decision|adr|what changed|next step|stale|交接|总结|下次继续|会话状态|记忆|记录决策|决策记录|改了什么|下一步|过期信息'; then
   add_hint "This looks like continuity or project memory work. Consider gamekit-handoff and project-memory-curator."
 fi
 
-if [ "$REVIEW_REQUEST" != "true" ] && prompt_matches 'gamekit-ask|engineering consultation|implementation approach|implementation strategy|better implementation|safer implementation|production method|tradeoff|trade-off|compatibility|coupling|stability|testability|how to make this stable|more stable|more maintainable'; then
+ASK_EXPLICIT=false
+ASK_RESEARCH_INTENT=false
+ASK_ENGINEERING_TARGET=false
+ASK_CONSULTATION_INTENT=false
+
+if prompt_matches 'gamekit-ask|engineering consultation'; then
+  ASK_EXPLICIT=true
+fi
+
+if prompt_matches 'official docs?|official guidance|official recommendation|best practices?|search|look up|web search|reference|reference material|community recommendation|community practice|latest|current practice|readme|examples?|do not rely on memory|without relying on memory|evidence-backed|联网|搜索|搜一下|查资料|查一下|官方|官方建议|社区推荐|最佳实践|参考资料|参考文档|不要只靠认知|不要凭记忆|最新|文档|示例'; then
+  ASK_RESEARCH_INTENT=true
+fi
+
+if prompt_matches 'implementation|implementation approach|implementation strategy|architecture|performance|compatibility|coupling|api|plugin|sdk|package|repository|repo|framework|engine|production method|stability|testability|third-party|实现|实现方式|接入|架构|性能|兼容|耦合|API|接口|插件|SDK|包|仓库|框架|引擎|制作方式|稳定|可测试|第三方'; then
+  ASK_ENGINEERING_TARGET=true
+fi
+
+if prompt_matches 'better implementation|safer implementation|tradeoff|trade-off|compare|comparison|how should|how would|how to|what approach|方案|怎么做|如何做|怎么接|如何接|更稳|更合理|取舍|对比|比较|讨论|咨询'; then
+  ASK_CONSULTATION_INTENT=true
+fi
+
+if [ "$ASK_EXPLICIT" = "true" ]; then
+  add_hint "This explicitly asks for gamekit-ask. Use read-only engineering consultation; use Research Mode when evidence is requested."
+elif [ "$REVIEW_REQUEST" != "true" ] && [ "$ASK_RESEARCH_INTENT" = "true" ] && [ "$ASK_ENGINEERING_TARGET" = "true" ]; then
+  add_hint "This asks for evidence-backed engineering consultation. Use gamekit-ask Research Mode first; if implementation is also requested, return to gamekit-build after the recommendation."
+elif [ "$REVIEW_REQUEST" != "true" ] && [ "$ASK_CONSULTATION_INTENT" = "true" ] && [ "$ASK_ENGINEERING_TARGET" = "true" ]; then
   add_hint "This looks like pre-implementation engineering consultation. Consider gamekit-ask; use gamekit-plan when scope, workstreams, or start decision are still unclear."
 fi
 

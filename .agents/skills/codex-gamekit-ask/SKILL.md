@@ -1,6 +1,6 @@
 ---
 name: codex-gamekit-ask
-description: Codex wrapper for the canonical Claude gamekit-ask workflow. Use the workflow in .claude/skills/gamekit-ask/SKILL.md for read-only engineering consultation before implementation.
+description: Codex wrapper for the canonical Claude gamekit-ask workflow. Use the workflow in .claude/skills/gamekit-ask/SKILL.md for read-only engineering consultation before implementation, including Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed engineering advice.
 ---
 
 # codex-gamekit-ask

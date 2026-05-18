@@ -1,3 +1,3 @@
 Use the canonical workflow in `.claude/skills/gamekit-ask/SKILL.md`.
 
-Apply it to the user's current engineering consultation request. Compare implementation approaches, architecture, compatibility, coupling, stability, performance, production method, and testability tradeoffs without editing files.
+Apply it to the user's current engineering consultation request. Compare implementation approaches, architecture, compatibility, coupling, stability, performance, production method, and testability tradeoffs without editing files. Use Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed engineering advice.

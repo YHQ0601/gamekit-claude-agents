@@ -146,7 +146,7 @@ Task flow:
 任务流程：
 
 1. Classify ambiguous or multi-part requests with `gamekit-plan`; include a compact engineering preflight and subagent decision.
-2. Use `gamekit-ask` for read-only engineering consultation before implementation when approach, architecture, compatibility, coupling, stability, performance, production method, or testability needs more thought.
+2. Use `gamekit-ask` for read-only engineering consultation before implementation; use its Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed advice.
 3. Use `architecture-reviewer` before architecture-sensitive work.
 4. Use `gamekit-build` and `game-code-worker` for focused implementation.
 5. Use `gamekit-assets` and `placeholder-asset-worker` for temporary art/blockout work.
@@ -171,7 +171,7 @@ Manual slash commands:
 手动斜杠命令：
 
 - `/gamekit-plan`: classify goal and scope, run a compact engineering preflight, choose the smallest useful slice, and decide workstreams/subagents.
-- `/gamekit-ask`: compare implementation approaches and engineering tradeoffs before editing files.
+- `/gamekit-ask`: compare implementation approaches and engineering tradeoffs before editing files; Research Mode checks evidence when official guidance, references, best practices, latest/current practice, or evidence-backed advice is requested.
 - `/gamekit-task`: create, split, refine, claim, block, close, or audit task cards under `docs/tasks/` without implementing them.
 - `/gamekit-plan`：分类范围、必要性、引擎 profile 和工作流。
 - `/gamekit-task`：创建、拆分、细化、领取、阻塞、关闭或审计 `docs/tasks/` 下的任务卡，但不实现任务。
