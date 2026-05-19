@@ -12,7 +12,7 @@ Purpose: run a minimal, engine-aware game implementation workflow.
 1. Restate the goal.
 2. Identify the active engine profile.
 3. Classify workstreams.
-4. Read project brief, architecture index, and relevant system cards if they exist.
+4. Read project brief, knowledge index, and relevant system cards if they exist.
 5. Verify current code and local engine patterns.
 6. Use the smallest viable implementation.
 7. Avoid unrelated refactors and dependency changes.
@@ -25,4 +25,4 @@ Purpose: run a minimal, engine-aware game implementation workflow.
 - Use exactly one `.claude/rules/profiles/*.md` when engine-specific files are involved.
 - Ask before adding packages, plugins, modules, SDKs, or major dependencies.
 - Treat save data, networking, economy, and serialized/editor-facing API as compatibility-sensitive.
-- If the implementation caused large changes, workflow/schema/template changes, or system boundary changes, make the memory update explicit and propose shared knowledge updates rather than silently editing shared docs.
+- If the implementation caused large changes, workflow/schema/template changes, stable system entry-point changes, or system boundary changes, make the memory update explicit and include a knowledge update decision. System Card, ADR, and knowledge index changes should be proposed unless the user explicitly asks for knowledge maintenance or runs a knowledge gate.

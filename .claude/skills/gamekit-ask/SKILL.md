@@ -14,7 +14,7 @@ Research Mode: when the user explicitly asks for online search, official guidanc
 ## Workflow
 
 1. Restate the engineering question.
-2. Read structured context first: local session state, project brief, architecture index, relevant system cards, then targeted files only as needed.
+2. Read structured context first: local session state, project brief, knowledge index, relevant system cards, then targeted files only as needed.
 3. Identify the active engine profile from evidence or user intent.
 4. When external APIs, plugins, repositories, performance conventions, or uncertain architecture choices affect the answer, check evidence before relying on memory: official docs first, then plugin/repository docs and examples, then mature community practice.
 5. Compare the smallest useful set of realistic options, usually two or three.
@@ -30,7 +30,7 @@ Research Mode: when the user explicitly asks for online search, official guidanc
 - Do not perform post-change validation. Use `gamekit-check` for verification, QA, debug triage, or risk review after changes.
 - Do not turn the answer into a full design document unless the user asks for one.
 - Do not paste long quotes or broad research notes. Summarize only evidence that changes the recommendation.
-- When a recommendation becomes user-confirmed design, trigger `project-memory-curator` after confirmation so it can record the approved design without marking it as code-verified.
+- When a recommendation becomes a user-confirmed design, trigger `project-memory-curator` after confirmation so it can record the approved design without marking it as code-verified. If the decision is long-lived, recommend an ADR proposal; do not write it without confirmation.
 
 ## Output Format
 

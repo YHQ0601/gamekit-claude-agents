@@ -19,7 +19,7 @@ prompt_matches() {
 }
 
 brief_engine() {
-  if [ -f "docs/ai/PROJECT_BRIEF.md" ]; then
+  if [ -f "docs/knowledge/PROJECT_BRIEF.md" ]; then
     awk '
       BEGIN { in_engine_section = 0 }
       /^[[:space:]]*Engine[[:space:]]*:/ {
@@ -42,7 +42,7 @@ brief_engine() {
         print value
         exit
       }
-    ' docs/ai/PROJECT_BRIEF.md
+    ' docs/knowledge/PROJECT_BRIEF.md
   fi
 }
 
@@ -142,8 +142,20 @@ if prompt_matches 'check|test|validate|verify|verification|qa|risk|safe|problem|
   add_hint "This asks for verification or risk review. Consider gamekit-check and game-qa-checker."
 fi
 
-if prompt_matches 'handoff|summary|summarize|continue later|session state|project memory|memory update|update memory|remember this|document decision|adr|what changed|next step|stale|交接|总结|下次继续|会话状态|记忆|记录决策|决策记录|改了什么|下一步|过期信息'; then
-  add_hint "This looks like continuity or project memory work. Consider gamekit-handoff and project-memory-curator."
+if prompt_matches 'handoff|summary|summarize|continue later|session state|project memory|memory update|update memory|remember this|document decision|what changed|next step|stale|交接|总结|下次继续|会话状态|记忆|记录决策|决策记录|改了什么|下一步|过期信息'; then
+  add_hint "This looks like continuity or project memory work. Consider gamekit-handoff and project-memory-curator; update session state first and only propose shared knowledge updates."
+fi
+
+if prompt_matches 'git push|pre-push|prepush|push[[:space:]]+((this|the)[[:space:]]+)?(branch|commits?|to origin)|publish[[:space:]]+((this|the)[[:space:]]+)?(branch|release)|release branch|ship branch'; then
+  add_hint "This looks like a push/publish checkpoint. Run a lightweight knowledge gate: check system boundaries, main flows, config/prefab/scene wiring, public conventions, ADR needs, and docs/knowledge stale status. Do not install a hard Git hook."
+fi
+
+if prompt_matches 'system card|stable system|system boundary|entry point|main flow|public convention|prefab.*wiring|scene.*wiring|config.*flow|configuration.*flow'; then
+  add_hint "This may need a System Card update decision. Existing code-verified cards may be refreshed only during user-requested knowledge maintenance or an explicit knowledge gate; new System Cards need user confirmation."
+fi
+
+if prompt_matches 'architecture decision|technical decision|long-term decision|adr|accepted decision'; then
+  add_hint "This may need an ADR proposal. docs/decisions entries require user confirmation before writing."
 fi
 
 ASK_EXPLICIT=false

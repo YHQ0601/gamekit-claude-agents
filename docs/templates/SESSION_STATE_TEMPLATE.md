@@ -9,7 +9,8 @@ Rules:
 - Record verified code facts and explicit user-confirmed decisions.
 - Mark unimplemented approved designs as approved but not code-verified.
 - Keep temporary experiments, guesses, and stale assumptions out of durable facts.
-- Propose shared knowledge updates for `docs/ai/*`, `docs/systems/*`, `docs/decisions/*`, and skill docs; do not silently apply them.
+- Handoff should update this local session state when there are verified or user-confirmed facts.
+- Propose shared knowledge updates for `docs/knowledge/*`, `docs/systems/*`, `docs/decisions/*`, and skill docs; do not silently apply them.
 - Keep unresolved ambiguity as direct questions under `Unclear / Ask Before Continuing`.
 
 ## Current Focus

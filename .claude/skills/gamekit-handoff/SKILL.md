@@ -9,6 +9,8 @@ Purpose: lightweight multi-session continuity summary.
 
 Before writing the handoff, run a `project-memory-curator` memory update decision. Update `.claude-local/SESSION_STATE.md` when there are verified or user-confirmed facts, but do not silently change shared knowledge files.
 
+Handoff is for continuity into a future session. It may recommend updates to `docs/knowledge/`, `docs/systems/`, or `docs/decisions/`, but shared docs are not written during handoff unless the user explicitly asks for knowledge maintenance.
+
 Use current repository code as the source of truth. Prefer the latest `.claude-local/SESSION_STATE.md` for continuity, but re-verify stale or high-impact facts from code or explicit user decisions.
 
 ## Ambiguity Handling
@@ -36,3 +38,5 @@ Use current repository code as the source of truth. Prefer the latest `.claude-l
 ## Next Step
 
 ## Stale / Verify Before Use
+
+## Shared Knowledge Recommendations

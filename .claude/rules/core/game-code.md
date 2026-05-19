@@ -29,7 +29,7 @@ Prefer the smallest design that passes these checks. If a lens exposes meaningfu
 
 - Identify the active engine or runtime before implementation.
 - Load the relevant profile from `.claude/rules/profiles/` when engine-specific files or workflows are involved.
-- If the engine is unknown, inspect repository structure and `docs/ai/PROJECT_BRIEF.md`; keep assumptions as `TBD`.
+- If the engine is unknown, inspect repository structure and `docs/knowledge/PROJECT_BRIEF.md`; keep assumptions as `TBD`.
 - In mixed-engine repositories, scope changes to the explicitly requested runtime.
 
 ## Gameplay Data

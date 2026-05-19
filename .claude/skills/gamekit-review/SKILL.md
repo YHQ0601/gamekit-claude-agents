@@ -45,7 +45,7 @@ Avoid:
 - Reviewer is a risk assessor and fix-plan advisor, not an implementer.
 - Do not edit files, apply patches, run formatters, or execute fixes.
 - If the user asks to fix review findings, return control to the main development workflow.
-- If project knowledge needs updating, propose it. Do not silently change `docs/ai/*`, `docs/systems/*`, `docs/decisions/*`, skill docs, or `.claude-local/SESSION_STATE.md` as part of review.
+- If project knowledge needs updating, provide a `Knowledge Update Recommendation`. Do not silently change `docs/knowledge/*`, `docs/systems/*`, `docs/decisions/*`, skill docs, or `.claude-local/SESSION_STATE.md` as part of review.
 
 ## Output Format
 
@@ -71,4 +71,4 @@ Advisory only. Do not implement fixes.
 
 Patch is correct / Patch is risky / Patch is incorrect
 
-## Memory / Knowledge Recommendation
+## Knowledge Update Recommendation

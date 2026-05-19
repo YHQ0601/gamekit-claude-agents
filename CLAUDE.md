@@ -23,7 +23,7 @@ Your responsibilities:
 
 ## Source of Truth
 
-Current repository code is the source of truth.
+Current repository code, engine assets, scenes/prefabs, and configuration are the source of truth for their actual state.
 Project knowledge files are navigation aids, not guaranteed facts.
 
 Priority:
@@ -60,7 +60,7 @@ Use one engine profile under `.claude/rules/profiles/` only when relevant:
 - `unreal.md`
 - `web-js.md`
 
-If the engine is unknown, inspect the repository and `docs/ai/PROJECT_BRIEF.md` before applying engine-specific assumptions.
+If the engine is unknown, inspect the repository and `docs/knowledge/PROJECT_BRIEF.md` before applying engine-specific assumptions.
 
 ## Agent Routing
 
@@ -104,12 +104,15 @@ Use `project-memory-curator` proactively at these checkpoints:
 
 ## Knowledge Policy
 
+- `docs/knowledge/` is the canonical shared project knowledge entry. Keep it as a short navigation index, not a complete fact database.
 - Do not create system documentation for systems that do not exist.
 - Use `TBD` for unknown facts.
-- Create System Cards only after a system exists or the user explicitly approves a design draft.
-- Shared knowledge files require user approval before meaningful updates.
+- Existing System Cards under `docs/systems/` may be refreshed only when the user explicitly asks for knowledge maintenance or runs a knowledge gate, and the changes are code-verified and scoped to stable entry points. New System Cards require user confirmation or an explicit knowledge gate.
+- ADRs under `docs/decisions/` require user confirmation before writing. Review, check, and push gates may propose ADRs but must not silently create accepted decisions.
+- Handoff updates `.claude-local/SESSION_STATE.md` first and only proposes shared knowledge updates.
+- Push, pre-push, and publish requests should trigger a lightweight knowledge gate recommendation; do not add hard Git hooks by default.
 - Local session state should be updated aggressively when the facts are verified or user-confirmed.
-- Shared knowledge updates should be proposed, not silently applied, for `docs/ai/*`, `docs/systems/*`, `docs/decisions/*`, and skill documentation.
+- Shared knowledge updates should be proposed, not silently applied, for `docs/knowledge/*`, new `docs/systems/*`, `docs/decisions/*`, and skill documentation.
 - User-confirmed designs should be recorded as approved design facts. If a design is not implemented yet, label it as approved but not code-verified.
 
 When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/templates/SESSION_STATE_TEMPLATE.md` as the tracked template. Suggested sections:

@@ -2,7 +2,7 @@
 
 This repository is a Claude-first game development workflow scaffold for Claude Code, Codex, opencode, and compatible agent tools.
 
-The current repository code is the source of truth. Project knowledge files are navigation aids, not proof that a gameplay system exists.
+The current repository code, engine assets, scenes/prefabs, and configuration are the source of truth for their actual state. Project knowledge files are navigation aids, not proof that a gameplay system exists.
 
 ## Tool Entry Points
 
@@ -116,9 +116,13 @@ Use `project-memory-curator` proactively at these checkpoints:
 
 ## Knowledge Update Policy
 
+- `docs/knowledge/` is the canonical shared project knowledge entry. Keep it as a short navigation index, not a complete fact database.
 - Local session state should be updated aggressively when facts are verified in code or explicitly confirmed by the user.
-- Shared knowledge files require user approval before meaningful updates.
-- Shared knowledge updates should be proposed, not silently applied, for `docs/ai/*`, `docs/systems/*`, `docs/decisions/*`, and skill documentation.
+- Existing System Cards under `docs/systems/` may be refreshed only when the user explicitly asks for knowledge maintenance or runs a knowledge gate, and the changes are code-verified and scoped to stable entry points. New System Cards require user confirmation or an explicit knowledge gate.
+- ADRs under `docs/decisions/` require user confirmation before writing. Review, check, and push gates may propose ADRs but must not silently create accepted decisions.
+- Handoff updates `.claude-local/SESSION_STATE.md` first and only proposes shared knowledge updates.
+- Push, pre-push, and publish requests should trigger a lightweight knowledge gate recommendation; do not add hard Git hooks by default.
+- Shared knowledge updates should be proposed, not silently applied, for `docs/knowledge/*`, new `docs/systems/*`, `docs/decisions/*`, and skill documentation.
 - User-confirmed designs should be recorded as approved design facts. If a design is not implemented yet, label it as approved but not code-verified.
 
 When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/templates/SESSION_STATE_TEMPLATE.md` as the tracked template. Suggested sections:
@@ -136,7 +140,7 @@ When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/template
 
 ## Context Budget
 
-- Prefer structured project context before broad scanning: `.claude-local/SESSION_STATE.md`, `docs/ai/PROJECT_BRIEF.md`, `docs/ai/ARCHITECTURE_INDEX.md`, relevant system cards, then targeted files.
+- Prefer structured project context before broad scanning: `.claude-local/SESSION_STATE.md`, `docs/knowledge/PROJECT_BRIEF.md`, `docs/knowledge/KNOWLEDGE_INDEX.md`, relevant system cards, then targeted files.
 - Read index files, templates, and relevant examples before expanding to broad search.
 - Do not read too many large files before summarizing.
 - For Unity `.prefab`, `.unity`, and `.asset` files, use the canonical `.claude/skills/gamekit-unity-yaml-context/SKILL.md` workflow to generate a compact Markdown summary before reading raw YAML.

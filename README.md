@@ -35,7 +35,7 @@ Claude Code 是主流程和事实源。Codex 与 opencode 只是兼容适配层�
 | Slash commands / 斜杠命令 | `.claude/commands/` |
 | Codex adapter / Codex 适配层 | `.codex/`, `.agents/skills/` |
 | opencode adapter / opencode 适配层 | `.opencode/`, `opencode.json` |
-| Project docs / 项目文档 | `docs/ai/`, `docs/templates/` |
+| Project docs / 项目文档 | `docs/knowledge/`, `docs/systems/`, `docs/decisions/`, `docs/templates/` |
 
 ## Design / 设计
 
@@ -97,9 +97,12 @@ Adapter files intentionally repeat small role summaries so each tool can discove
 - `.agents/skills/`：Codex wrapper skills，指回主流程 `.claude/skills/`。
 - `.opencode/` and `opencode.json`: opencode project agents and rule loading.
 - `.opencode/` 与 `opencode.json`：opencode 项目 agents 和规则加载配置。
-- `docs/ai/`: project brief and architecture index.
-- `docs/ai/`：项目简报和架构索引。
-- `docs/templates/`: task, system card, ADR, and placeholder asset templates.
+- `docs/knowledge/`: project brief and short knowledge index.
+- `docs/ai/`: deprecated compatibility pointer to `docs/knowledge/`.
+- `docs/systems/`: System Cards for code-verified system entry points and safe modification notes.
+- `docs/decisions/`: ADRs for important long-term decisions.
+- `docs/knowledge/`：项目简报和架构索引。
+- `docs/templates/`: task, knowledge index, system card, ADR, session state, and placeholder asset templates.
 - `docs/templates/`：任务卡、系统卡、ADR 和占位资源模板。
 
 ## Intended Use / 使用场景
@@ -130,14 +133,14 @@ Startup flow:
 1. Run `.claude/hooks/bootstrap-session.sh`.
 2. Read `CLAUDE.md`.
 3. Load `.claude/rules/core/*.md`.
-4. Detect the active engine profile from project files or `docs/ai/PROJECT_BRIEF.md`.
+4. Detect the active engine profile from project files or `docs/knowledge/PROJECT_BRIEF.md`.
 5. Load one matching profile from `.claude/rules/profiles/` only when relevant.
 6. Use `.claude/hooks/route-user-prompt.sh` to provide routing hints for each user request.
 
 1. 运行 `.claude/hooks/bootstrap-session.sh`。
 2. 读取 `CLAUDE.md`。
 3. 加载 `.claude/rules/core/*.md`。
-4. 根据项目文件或 `docs/ai/PROJECT_BRIEF.md` 检测当前引擎 profile。
+4. 根据项目文件或 `docs/knowledge/PROJECT_BRIEF.md` 检测当前引擎 profile。
 5. 只有在相关时，加载 `.claude/rules/profiles/` 中对应的一个 profile。
 6. 每次用户输入后，通过 `.claude/hooks/route-user-prompt.sh` 给出路由提示。
 
@@ -230,8 +233,8 @@ Core rules are always relevant. Engine profiles are used only when the project d
 
 - Claude opens or works on files matched by a profile's `paths` frontmatter; or
 - Claude 打开或处理匹配 profile `paths` frontmatter 的文件；或者
-- `docs/ai/PROJECT_BRIEF.md` has `Engine: Unity`, `Godot`, `Unreal`, or `Web/JS`; or
-- `docs/ai/PROJECT_BRIEF.md` 中写明 `Engine: Unity`、`Godot`、`Unreal` 或 `Web/JS`；或者
+- `docs/knowledge/PROJECT_BRIEF.md` has `Engine: Unity`, `Godot`, `Unreal`, or `Web/JS`; or
+- `docs/knowledge/PROJECT_BRIEF.md` 中写明 `Engine: Unity`、`Godot`、`Unreal` 或 `Web/JS`；或者
 - the repository contains clear engine markers such as `ProjectSettings/`, `project.godot`, `*.uproject`, or `package.json`; or
 - 仓库中存在清晰的引擎标记，例如 `ProjectSettings/`、`project.godot`、`*.uproject` 或 `package.json`；或者
 - the user asks for engine-specific work.
@@ -336,11 +339,17 @@ Typical task status flow:
 
 ## Project Knowledge Policy / 项目知识规则
 
-The repository code is the source of truth. Documentation is navigation and memory, not proof that a gameplay system exists.
+The repository code is the source of truth. Unity prefabs/scenes, configuration, and assets are also authoritative for their own serialized state. Documentation is navigation and memory, not proof that a gameplay system exists.
 
 仓库代码是事实源。文档用于导航和记忆，不等于某个玩法系统已经真实存在。
 
-Unknown project facts should stay as `TBD`. System cards should be created only after the system exists in code, or after the user explicitly approves a design draft.
+`docs/knowledge/` is the canonical project knowledge entry and should stay short: project brief, system card index, ADR index, stale reminders, and last verified status. `docs/ai/` is deprecated compatibility space and should not receive active facts.
+
+Unknown project facts should stay as `TBD`. Existing System Cards may be refreshed only when the user explicitly asks for knowledge maintenance or runs a knowledge gate, and the changes are code-verified and scoped to stable entry points. New System Cards require user confirmation or an explicit knowledge gate.
+
+ADRs in `docs/decisions/` require user confirmation before writing. Review/check workflows only recommend knowledge updates. Handoff updates `.claude-local/SESSION_STATE.md` first and only proposes shared documentation updates.
+
+Push, pre-push, and publish requests should run a lightweight knowledge gate, but this scaffold does not install a hard Git pre-push hook by default.
 
 未知项目事实应保持为 `TBD`。只有当系统已在代码中存在，或用户明确批准设计草案时，才创建 System Card。
 

@@ -24,6 +24,7 @@ Use this as a debug triage workflow when the user reports a bug, crash, missing 
 11. For debug triage, identify reproduction clues, likely failure surface, and next evidence to collect before proposing fixes.
 12. Do not implement fixes. If fixes are needed, return control to the main implementation workflow.
 13. End with a `project-memory-curator` memory update decision when validation, QA, or triage establishes new facts, remaining risks, stale assumptions, or next checks.
+14. If validation shows stale shared knowledge, output a `Knowledge Update Recommendation`; do not edit shared docs from check.
 
 ## Output Format
 
@@ -44,3 +45,5 @@ Include automated checks, manual checks, and debug triage only when relevant.
 Pass / Risky / Fail
 
 ## Memory Update Decision
+
+## Knowledge Update Recommendation

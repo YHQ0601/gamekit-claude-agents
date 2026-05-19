@@ -2,7 +2,7 @@
 set -euo pipefail
 
 brief_engine() {
-  if [ -f "docs/ai/PROJECT_BRIEF.md" ]; then
+  if [ -f "docs/knowledge/PROJECT_BRIEF.md" ]; then
     awk '
       BEGIN { in_engine_section = 0 }
       /^[[:space:]]*Engine[[:space:]]*:/ {
@@ -25,7 +25,7 @@ brief_engine() {
         print value
         exit
       }
-    ' docs/ai/PROJECT_BRIEF.md
+    ' docs/knowledge/PROJECT_BRIEF.md
   fi
 }
 
@@ -67,8 +67,8 @@ if printf '%s' "$ENGINE" | grep -Eqi '^Unity'; then
 fi
 echo "- Use REVIEW.md and gamekit-review only for explicit manual review requests."
 echo "- Use gamekit-task and task-card-manager only for explicit task-card management requests."
-echo "- Use docs/ai/PROJECT_BRIEF.md for project overview if needed."
-echo "- Use docs/ai/ARCHITECTURE_INDEX.md for known system map if needed."
+echo "- Use docs/knowledge/PROJECT_BRIEF.md for project overview if needed."
+echo "- Use docs/knowledge/KNOWLEDGE_INDEX.md for the short project knowledge index if needed."
 echo "- Use .claude-local/SESSION_STATE.md for local continuity if present."
 echo
 echo "## Git State"
