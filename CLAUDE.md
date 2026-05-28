@@ -79,7 +79,7 @@ Subagent flow:
 - Use subagents automatically only when the active tool supports them and the user's request already authorizes that kind of work.
 - `gamekit-plan` may route to `architecture-reviewer`, `game-code-worker`, `placeholder-asset-worker`, `game-qa-checker`, or `task-card-manager`.
 - `gamekit-ask` usually uses no subagent; serious architecture tradeoffs may use or recommend read-only `architecture-reviewer`.
-- `gamekit-check` may use `game-qa-checker`; `gamekit-review` may use `code-reviewer` only for explicit review.
+- `gamekit-check` may use `game-qa-checker`; `gamekit-review` must use `code-reviewer` for explicit review when subagent delegation is available.
 
 Use:
 
@@ -87,7 +87,7 @@ Use:
 - `game-code-worker` for focused implementation in the active engine or runtime.
 - `placeholder-asset-worker` when temporary assets, blockouts, icons, VFX placeholders, UI placeholders, or replacement plans are needed.
 - `game-qa-checker` after code, asset, scene, content, package, or behavior-affecting changes.
-- `code-reviewer` only when the user explicitly asks for code review, PR review, diff review, staged change review, or pre-commit review. This role is read-only, must not implement fixes, and returns risk levels with recommended fix plans.
+- `code-reviewer` only when the user explicitly asks for code review, PR review, diff review, staged change review, or pre-commit review. This role is read-only, must not implement fixes, and returns findings, risk levels, per-finding fix plans, and validation recommendations.
 - `task-card-manager` manually when the user asks to create, split, refine, claim, block, close, or audit task cards under `docs/tasks/`. It writes task cards for later execution and must not implement code.
 - `project-memory-curator` after meaningful tasks, architecture decisions, major file moves, or stale memory risks.
 

@@ -4,7 +4,7 @@ Use this file for manual review-only work such as `/gamekit-review`, "review thi
 
 ## Scope
 
-Review the current diff, staged changes, unstaged changes, PR patch, or explicitly named files. Do not review unrelated areas unless the changed code proves they are affected.
+Review the current diff, staged changes, unstaged changes, PR patch, or explicitly named files. Inspect the diff before reading wider context. Do not review unrelated areas unless the changed code proves they are affected.
 
 ## Review Priorities
 
@@ -20,7 +20,20 @@ Focus on issues the author would likely fix:
 
 For Unity review scope, also check affected `Assets/`, `ProjectSettings/`, `Packages/manifest.json`, `.asmdef`, `.unity`, `.prefab`, `.asset`, and `.meta` changes for Missing Script, Missing Reference, serialized field migration, editor-only API, package/input/render pipeline, Addressables, prefab variant, scene, and ScriptableObject reference risks.
 
+For Unity `.prefab`, `.unity`, or `.asset` review, use `gamekit-unity-yaml-context` before reading full serialized YAML unless the diff itself already provides enough evidence.
+
 For low-risk Unity C#-only review recommendations, `dotnet build <solution>.sln --no-restore` may be suggested as a `C# compile-layer proxy check`, but not as Unity validation.
+
+## Finding Quality Gate
+
+Report a finding only when it is:
+
+- introduced or exposed by the reviewed change;
+- actionable by the author;
+- backed by a concrete affected path, code path, asset path, scene path, prefab path, or runtime/editor scenario;
+- important enough to fix before merge or explicitly accept as risk.
+
+Do not report low-confidence speculation, broad preferences, or generic best-practice advice.
 
 ## Boundaries
 
@@ -29,7 +42,7 @@ For low-risk Unity C#-only review recommendations, `dotnet build <solution>.sln 
 - Do not make product decisions.
 - Do not flag broad style preferences unless they obscure behavior or violate a documented project rule.
 - Do not speculate about possible breakage without identifying the affected code path, asset path, scene path, or runtime scenario.
-- Include the risk level and a recommended fix plan for each actionable finding.
+- Include the risk level and a per-finding fix plan for each actionable finding.
 - Keep fix plans advisory. The main development session decides whether to implement them.
 - Do not treat project documentation as proof that a system exists; verify against repository files.
 - Prefer fewer high-confidence findings over long lists of weak concerns.
@@ -46,15 +59,22 @@ When used as a local review workflow, report:
 - `[P2]`: normal actionable bug or maintainability risk
 - `[P3]`: low severity, optional improvement
 
+Use this shape for every actionable finding:
+
+- `[P1] Short issue title`
+  - Location: `path/to/file` line, code path, asset path, prefab path, or scene path
+  - Scenario: when this breaks
+  - Impact: why this matters
+  - Fix Plan: advisory change plan only
+  - Validation: smallest useful check
+
+If there are no actionable findings, write `No actionable findings.`
+
 ## Risk Level
 
 Low / Medium / High / Critical
 
 ## Review Scope / Engine
-
-## Recommended Fix Plan
-
-Advisory only. Do not implement fixes.
 
 ## Validation Recommendation
 

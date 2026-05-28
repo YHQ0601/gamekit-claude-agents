@@ -7,7 +7,7 @@ The current repository code, engine assets, scenes/prefabs, and configuration ar
 ## Tool Entry Points
 
 - Claude Code keeps using `CLAUDE.md`, `.claude/agents/`, `.claude/skills/`, `.claude/commands/`, `.claude/rules/`, and `.claude/hooks/`. Do not change that workflow when adding Codex or opencode support.
-- Manual review should use `REVIEW.md` and `gamekit-review`. Reviewers must return findings, risk level, recommended fix plan, and validation recommendation instead of applying fixes.
+- Manual review should use `REVIEW.md` and `gamekit-review`. Reviewers must return findings, risk level, per-finding fix plans, and validation recommendations instead of applying fixes.
 - Manual task-card management should use `gamekit-task`, `task-card-manager`, `docs/templates/TASK_TEMPLATE.md`, and parent/child task cards under `docs/tasks/`.
 - Unity YAML context work should use `gamekit-unity-yaml-context` before reading full `.prefab`, `.unity`, or `.asset` files.
 - Unity prefab or scene mutation work should use `gamekit-unity-prefab-edit`; use `gamekit-unity-yaml-context` before reading raw serialized YAML. When mutation requires the Unity Editor backend and `Assets/Editor/AgentTools/PrefabEditTool.cs` is missing, install it from the skill template automatically.
@@ -72,13 +72,13 @@ Subagent flow:
 - Use subagents automatically only when the active tool supports them and the user's request already authorizes that kind of work.
 - `gamekit-plan` may route to `architecture-reviewer`, `game-code-worker`, `placeholder-asset-worker`, `game-qa-checker`, or `task-card-manager`.
 - `gamekit-ask` usually uses no subagent; serious architecture tradeoffs may use or recommend read-only `architecture-reviewer`.
-- `gamekit-check` may use `game-qa-checker`; `gamekit-review` may use `code-reviewer` only for explicit review.
+- `gamekit-check` may use `game-qa-checker`; `gamekit-review` must use `code-reviewer` for explicit review when subagent delegation is available.
 
 - `architecture-reviewer`: use before implementation when work may affect architecture, gameplay system boundaries, data models, save data, economy, networking, performance, extensibility, or long-term maintainability. This role must not edit files.
 - `game-code-worker`: use for focused game implementation, engine scripts, gameplay logic, input handling, UI logic, compile/build fixes, and small refactors.
 - `placeholder-asset-worker`: use when temporary assets, blockouts, placeholder prefabs/scenes/nodes/blueprints, VFX placeholders, UI placeholders, icons, or replacement plans are needed.
 - `game-qa-checker`: use after code, asset, scene, content, package, dependency, or behavior-affecting changes, and when the user asks for verification or risk review. This role must not implement features.
-- `code-reviewer`: use only when the user explicitly asks for code review, PR review, diff review, staged change review, or pre-commit review. This role must not edit files or implement fixes; it returns risk levels and recommended fix plans.
+- `code-reviewer`: use only when the user explicitly asks for code review, PR review, diff review, staged change review, or pre-commit review. This role must not edit files or implement fixes; it returns findings, risk levels, per-finding fix plans, and validation recommendations.
 - `task-card-manager`: use manually when the user asks to create, split, refine, claim, block, close, or audit task cards under `docs/tasks/`. This role writes task cards for later execution and must not implement code.
 - `project-memory-curator`: use after meaningful tasks, architecture decisions, major file moves, or stale memory risks. Shared knowledge updates require user approval; local session state may be updated more frequently.
 

@@ -131,7 +131,7 @@ if prompt_matches 'temporary asset|placeholder|blockout|greybox|whitebox|mock vi
 fi
 
 if [ "$REVIEW_REQUEST" = "true" ]; then
-  add_hint "This is an explicit manual review request. Use gamekit-review and code-reviewer; do not edit files during review."
+  add_hint "This is an explicit manual review request. Use gamekit-review and delegate the review body to code-reviewer when subagents are available; do not edit files during review."
 fi
 
 if [ "$REVIEW_FIX_REQUEST" = "true" ]; then
