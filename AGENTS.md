@@ -65,6 +65,7 @@ Workflow routing:
 - `gamekit-ask`: use for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability. Use its Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed advice.
 - `gamekit-check`: use after behavior-affecting changes or for debug triage. It validates risks but does not implement fixes.
 - `gamekit-review`: use only for explicit review requests. It remains read-only and findings-first.
+- Mixed placeholder asset plus integration work must be sequenced: use `gamekit-assets` or `placeholder-asset-worker` for placeholder creation first, then `gamekit-build` for code/data/UnitDef/prefab/scene integration and validation.
 
 Subagent flow:
 

@@ -70,6 +70,9 @@ detect_engine() {
 ENGINE="$(detect_engine)"
 REVIEW_FIX_REQUEST=false
 REVIEW_REQUEST=false
+PLACEHOLDER_ASSET_REQUEST=false
+INTEGRATION_REQUEST=false
+EXPLICIT_BUILD_PLACEHOLDER=false
 
 if prompt_matches '(fix|address|resolve|implement|apply|handle|follow up).*(review|comment|finding|feedback|issue|suggestion)|((review|comment|finding|feedback).*(fix|address|resolve|implement|apply|handle|follow up))|(修复|处理|解决|应用).*(review|审查|评审|意见|反馈|问题|finding)|(根据|按照).*(review|审查|评审|意见|反馈|问题|finding).*(修改|修复|处理|解决|应用)'; then
   REVIEW_FIX_REQUEST=true
@@ -77,6 +80,18 @@ fi
 
 if [ "$REVIEW_FIX_REQUEST" != "true" ] && prompt_matches 'gamekit-review|code review([[:space:]]+(current|this|the|diff|changes|patch|pr|pull request|staged|unstaged))?|review[[:space:]]+(current|this|the)[[:space:]]+(diff|changes|patch|pr|pull request|staged|unstaged)|review[[:space:]]+(staged|unstaged)[[:space:]]+changes|review[[:space:]]+this[[:space:]]+pr|pr review|pull request review|pre-commit review|staged review|审查(当前|这次|本次|diff|PR|pr|改动|修改)|代码审查|评审(当前|这次|本次|diff|PR|pr|改动|修改)'; then
   REVIEW_REQUEST=true
+fi
+
+if prompt_matches 'temporary asset|placeholder|blockout|greybox|whitebox|mock visual|prototype visual|primitive|artist handoff|artist replacement|replacement anchor|placeholder prefab|placeholder material|placeholder icon|placeholder vfx|placeholder ui|VFX|vfx|特效|投射物|占位|白盒|灰盒|临时资源|临时模型|美术交接|美术替换|替换锚点|占位图标|占位特效|占位界面'; then
+  PLACEHOLDER_ASSET_REQUEST=true
+fi
+
+if prompt_matches 'UnitDef|ScriptableObject|config|configuration|configure|wire|wiring|assign|bind|attach|set|配置|绑定|挂载|接入|设置|分配'; then
+  INTEGRATION_REQUEST=true
+fi
+
+if prompt_matches 'gamekit-build' && [ "$PLACEHOLDER_ASSET_REQUEST" = "true" ]; then
+  EXPLICIT_BUILD_PLACEHOLDER=true
 fi
 
 case "$(printf '%s' "$ENGINE" | tr '[:upper:]' '[:lower:]')" in
@@ -115,7 +130,9 @@ if prompt_matches 'gamekit-task|task-card-manager|task card|docs/tasks|claim tas
 fi
 
 if [ "$REVIEW_REQUEST" != "true" ] && prompt_matches 'implement[[:space:]]+(this|the|a|an)?[[:space:]]*(feature|change|system|mechanic|ui)|code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色|完成.*功能|完成.*系统|完成.*菜单|完成.*界面|完成.*UI|完成.*脚本|完成.*代码|完成.*玩法|完成.*关卡|完成.*模块|完成.*组件|任务系统|任务奖励|任务玩法|任务逻辑|任务功能|任务界面|任务UI|任务数据|任务链|任务目标|任务进度|任务追踪|任务完成|任务提交|任务领取|任务触发|任务条件|任务面板|任务脚本|任务管理器|实现.*任务|修复.*任务|添加.*任务|开发.*任务|制作.*任务|任务.*系统|任务.*奖励'; then
-  add_hint "This looks like focused implementation work. Consider gamekit-build and game-code-worker."
+  if [ "$PLACEHOLDER_ASSET_REQUEST" != "true" ]; then
+    add_hint "This looks like focused implementation work. Consider gamekit-build and game-code-worker."
+  fi
 fi
 
 if prompt_matches 'plan|design|scope|should we|worth it|requirement|feature request|unclear|break down|方案|计划|范围|要不要|是否值得|需求|不明确|拆分'; then
@@ -126,8 +143,14 @@ if prompt_matches 'architecture|refactor|system boundary|data model|save data|ec
   add_hint "This may affect architecture or long-term maintainability. Consider architecture-reviewer before implementation."
 fi
 
-if prompt_matches 'temporary asset|placeholder|blockout|greybox|whitebox|mock visual|prototype visual|primitive|artist handoff|artist replacement|replacement anchor|placeholder prefab|placeholder material|placeholder icon|placeholder vfx|placeholder ui|临时资源|占位|白盒|灰盒|临时模型|美术交接|美术替换|替换锚点|占位图标|占位特效|占位界面'; then
+if [ "$EXPLICIT_BUILD_PLACEHOLDER" = "true" ]; then
+  add_hint "Do not use gamekit-build as the primary workflow for placeholder asset creation. Use gamekit-assets or placeholder-asset-worker first; gamekit-build can handle integration after the asset handoff."
+elif [ "$PLACEHOLDER_ASSET_REQUEST" = "true" ] && [ "$INTEGRATION_REQUEST" = "true" ]; then
+  add_hint "This is mixed placeholder asset plus integration work. Use gamekit-assets or placeholder-asset-worker for placeholder creation first, then gamekit-build for code/data/UnitDef/prefab/scene integration, then gamekit-check for validation."
+elif [ "$PLACEHOLDER_ASSET_REQUEST" = "true" ]; then
   add_hint "This includes temporary or replaceable asset work. Consider gamekit-assets and placeholder-asset-worker."
+elif [ "$REVIEW_REQUEST" != "true" ] && [ "$INTEGRATION_REQUEST" = "true" ] && prompt_matches 'UnitDef|ScriptableObject|config|configuration|configure|wire|wiring|assign|bind|attach|set|配置|绑定|挂载|接入|设置|分配'; then
+  add_hint "This looks like asset/data integration work. Consider gamekit-build for wiring/configuration and gamekit-check for validation."
 fi
 
 if [ "$REVIEW_REQUEST" = "true" ]; then

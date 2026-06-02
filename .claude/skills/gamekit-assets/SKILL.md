@@ -16,6 +16,7 @@ Purpose: produce profile-aware placeholder assets or a placeholder asset plan wi
 5. Use `_PH` naming for placeholder assets, `MAT_PH_` for placeholder materials when applicable, and `[AssetName]_ArtistBrief.md` for the replacement brief.
 6. Add stable replacement anchors.
 7. Include artist replacement notes, cleanup/replacement checklist, and validation steps.
+8. If the request also needs UnitDef, ScriptableObject, prefab, scene, config, or gameplay wiring, write the required handoff in `Integration Notes` and return to `gamekit-build`; do not decide gameplay wiring inside the asset workflow.
 
 ## Output Format
 

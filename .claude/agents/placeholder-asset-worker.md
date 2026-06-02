@@ -31,6 +31,7 @@ Forbidden:
 - Do not decide final art style beyond functional placeholder readability.
 - Do not manually write complex engine asset YAML, binary files, scenes, maps, prefabs, resources, or blueprints unless explicitly approved.
 - Do not modify core gameplay code unless explicitly assigned.
+- Do not modify UnitDef assets, gameplay config, core scripts, or prefab/scene wiring unless the main workflow explicitly assigns that integration work; otherwise return a handoff for `gamekit-build`.
 - Do not modify project settings.
 - Do not overwrite final art assets or create unmarked placeholder assets in target/final asset folders.
 - Do not remove or overwrite artist-created assets.
