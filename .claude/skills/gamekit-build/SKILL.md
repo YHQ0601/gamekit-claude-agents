@@ -12,7 +12,7 @@ Purpose: run a minimal, engine-aware game implementation workflow.
 1. Restate the goal.
 2. Identify the active engine profile.
 3. Classify workstreams.
-4. Read project brief, knowledge index, and relevant system cards if they exist.
+4. Read project brief, architecture index, and relevant system cards if they exist.
 5. Verify current code and local engine patterns.
 6. Use the smallest viable implementation.
 7. Avoid unrelated refactors and dependency changes.
@@ -26,4 +26,12 @@ Purpose: run a minimal, engine-aware game implementation workflow.
 - Placeholder, temporary art, VFX placeholder, icon, and UI placeholder creation is an asset workstream. `gamekit-build` may orchestrate mixed work, but placeholder asset creation should go through `gamekit-assets` or `placeholder-asset-worker` first; use `gamekit-build` for code, data, UnitDef/ScriptableObject wiring, integration, and validation after the asset handoff.
 - Ask before adding packages, plugins, modules, SDKs, or major dependencies.
 - Treat save data, networking, economy, and serialized/editor-facing API as compatibility-sensitive.
-- If the implementation caused large changes, workflow/schema/template changes, stable system entry-point changes, or system boundary changes, make the memory update explicit and include a knowledge update decision. System Card, ADR, and knowledge index changes should be proposed unless the user explicitly asks for knowledge maintenance or runs a knowledge gate.
+- If the implementation caused large changes, workflow/schema/template changes, or system boundary changes, make the memory update explicit and propose shared knowledge updates rather than silently editing shared docs.
+
+## Direct Fix Mode
+
+Use this when the user explicitly asks for a clear small fix, or when `/gamekit-check` uses Safe Auto-Fix Escalation.
+
+- Make exactly one smallest localized fix for a `Direct Fix Candidate`: compile error, syntax/using/namespace mistake, obvious parameter or enum mistake, inverted condition, or local UI state/text mapping error.
+- Stop and return to `gamekit-check` or `gamekit-plan` if the root cause is unclear, scope expands, a design decision is needed, or the change touches high-risk Unity serialized data, prefab/scene wiring, ScriptableObject migration, save data, packages, project settings, architecture boundaries, or cross-system flow.
+- After a direct fix, run or request the smallest relevant validation, then return the result to `gamekit-check` when escalation started there.

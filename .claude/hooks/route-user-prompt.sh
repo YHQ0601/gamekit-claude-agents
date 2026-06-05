@@ -4,7 +4,7 @@ set -euo pipefail
 INPUT="$(cat)"
 
 extract_prompt_with_python() {
-  python -c 'import json, sys; data = sys.stdin.read(); parsed = json.loads(data); value = parsed.get("prompt", "") if isinstance(parsed, dict) else data; sys.stdout.buffer.write(("" if value is None else str(value)).encode("utf-8"))' 2>/dev/null
+  python -c 'import json, sys; data = sys.stdin.buffer.read().decode("utf-8", "replace"); parsed = json.loads(data); value = parsed.get("prompt", "") if isinstance(parsed, dict) else data; sys.stdout.buffer.write(("" if value is None else str(value)).encode("utf-8"))' 2>/dev/null
 }
 
 extract_prompt_with_jq() {
@@ -31,6 +31,32 @@ add_hint() {
 
 prompt_matches() {
   printf '%s' "$PROMPT" | grep -Eqi "$1"
+}
+
+prompt_py_readonly_intent() {
+  command -v python >/dev/null 2>&1 || return 1
+  printf '%s' "$PROMPT" | python -c 'import sys
+s = sys.stdin.buffer.read().decode("utf-8", "replace").lower()
+terms = ["read-only", "readonly", "only report", "report only", "do not edit", "do not change", "do not modify", "no edit", "no changes", "只读", "只检查", "只报告", "不要改", "别改", "不要修改", "不修改", "仅检查", "仅报告"]
+raise SystemExit(0 if any(t.lower() in s for t in terms) else 1)' 2>/dev/null
+}
+
+prompt_py_direct_fix_intent() {
+  command -v python >/dev/null 2>&1 || return 1
+  printf '%s' "$PROMPT" | python -c 'import re, sys
+s = sys.stdin.buffer.read().decode("utf-8", "replace").lower()
+fix_terms = ["fix", "repair", "resolve", "correct", "change", "update", "修复", "解决", "改正", "修改", "改一下", "处理"]
+clue_terms = ["compile error", "compiler error", "build error", "syntax", "using", "namespace", "typo", "semicolon", "comma", "parameter", "param", "constant", "enum", "condition", "predicate", "mapping", "label", "text", "编译报错", "编译错误", "构建错误", "语法", "命名空间", "少了", "标点", "分号", "逗号", "参数", "数值", "常量", "枚举", "条件", "判断", "映射", "文案", "错误"]
+direct_value = re.search(r"(改成|应该是)\s*\S+", s) is not None
+raise SystemExit(0 if direct_value or (any(t.lower() in s for t in fix_terms) and any(t.lower() in s for t in clue_terms)) else 1)' 2>/dev/null
+}
+
+prompt_py_check_intent() {
+  command -v python >/dev/null 2>&1 || return 1
+  printf '%s' "$PROMPT" | python -c 'import sys
+s = sys.stdin.buffer.read().decode("utf-8", "replace").lower()
+terms = ["check", "test", "validate", "verify", "verification", "qa", "risk", "safe", "problem", "bug", "regression", "missing reference", "manual test", "playtest", "debug", "crash", "log", "检查", "测试", "验证", "风险", "安全", "有没有问题", "有问题吗", "哪里有问题", "排查", "问题排查", "偶现", "报错", "回归", "引用丢失", "手动测试", "调试", "崩溃", "日志"]
+raise SystemExit(0 if any(t.lower() in s for t in terms) else 1)' 2>/dev/null
 }
 
 brief_engine() {
@@ -88,6 +114,10 @@ REVIEW_REQUEST=false
 PLACEHOLDER_ASSET_REQUEST=false
 INTEGRATION_REQUEST=false
 EXPLICIT_BUILD_PLACEHOLDER=false
+CHECK_COMMAND_REQUEST=false
+CHECK_READONLY_REQUEST=false
+DIRECT_FIX_REQUEST=false
+CHECK_INTENT_REQUEST=false
 
 if prompt_matches '(fix|address|resolve|implement|apply|handle|follow up).*(review|comment|finding|feedback|issue|suggestion)|((review|comment|finding|feedback).*(fix|address|resolve|implement|apply|handle|follow up))|(修复|处理|解决|应用).*(review|审查|评审|意见|反馈|问题|finding)|(根据|按照).*(review|审查|评审|意见|反馈|问题|finding).*(修改|修复|处理|解决|应用)'; then
   REVIEW_FIX_REQUEST=true
@@ -107,6 +137,26 @@ fi
 
 if prompt_matches 'gamekit-build' && [ "$PLACEHOLDER_ASSET_REQUEST" = "true" ]; then
   EXPLICIT_BUILD_PLACEHOLDER=true
+fi
+
+if prompt_matches '(^|[^[:alnum:]_-])/?gamekit-check([^[:alnum:]_-]|$)'; then
+  CHECK_COMMAND_REQUEST=true
+fi
+
+if prompt_matches 'read[- ]?only|readonly|only report|report only|do not edit|do not change|do not modify|don.t edit|don.t change|no edits?|no changes?|只读|只检查|只报告|不要改|别改|不要修改|不修改|仅检查|仅报告' || prompt_py_readonly_intent; then
+  CHECK_READONLY_REQUEST=true
+fi
+
+if prompt_matches '((fix|repair|resolve|correct|change|update|修复|解决|改正|修改|改一下|处理).*(compile error|compiler error|build error|syntax|using|namespace|typo|semicolon|comma|parameter|param|constant|enum|condition|predicate|mapping|label|text|编译报错|编译错误|构建错误|语法|命名空间|少了|标点|分号|逗号|参数|数值|常量|枚举|条件|判断|映射|文案|错误))|((compile error|compiler error|build error|syntax|using|namespace|typo|semicolon|comma|parameter|param|constant|enum|condition|predicate|mapping|label|text|编译报错|编译错误|构建错误|语法|命名空间|少了|标点|分号|逗号|参数|数值|常量|枚举|条件|判断|映射|文案|错误).*(fix|repair|resolve|correct|change|update|修复|解决|改正|修改|改一下|处理))|改成[[:space:]]*[^[:space:]]+|应该是[[:space:]]*[^[:space:]]+' || prompt_py_direct_fix_intent; then
+  DIRECT_FIX_REQUEST=true
+fi
+
+if [ "$CHECK_COMMAND_REQUEST" = "true" ] && prompt_matches 'compile error|compiler error|build error|syntax|using|namespace|typo|semicolon|comma|parameter|param|constant|enum|condition|predicate|mapping|label|text'; then
+  DIRECT_FIX_REQUEST=true
+fi
+
+if prompt_matches 'check|test|validate|verify|verification|qa|risk|safe|problem|bug|regression|serialization|missing reference|manual test|playtest|debug|crash|log|检查|测试|验证|风险|安全|有没有问题|有问题吗|哪里有问题|检查.*问题|验证.*问题|测试.*问题|排查.*问题|问题排查|回归|引用丢失|手动测试|调试|排查|崩溃|日志' || prompt_py_check_intent; then
+  CHECK_INTENT_REQUEST=true
 fi
 
 case "$(printf '%s' "$ENGINE" | tr '[:upper:]' '[:lower:]')" in
@@ -144,7 +194,7 @@ if prompt_matches 'gamekit-task|task-card-manager|task card|docs/tasks|claim tas
   add_hint "This looks like task-card workflow. Consider gamekit-task and task-card-manager; read docs/templates/TASK_TEMPLATE.md and relevant docs/tasks/** task cards, and do not claim a task unless the user explicitly asks."
 fi
 
-if [ "$REVIEW_REQUEST" != "true" ] && [ "$PLACEHOLDER_ASSET_REQUEST" != "true" ] && prompt_matches 'implement[[:space:]]+(this|the|a|an)?[[:space:]]*(feature|change|system|mechanic|ui)|code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色|完成.*功能|完成.*系统|完成.*菜单|完成.*界面|完成.*UI|完成.*脚本|完成.*代码|完成.*玩法|完成.*关卡|完成.*模块|完成.*组件|任务系统|任务奖励|任务玩法|任务逻辑|任务功能|任务界面|任务UI|任务数据|任务链|任务目标|任务进度|任务追踪|任务完成|任务提交|任务领取|任务触发|任务条件|任务面板|任务脚本|任务管理器|实现.*任务|修复.*任务|添加.*任务|开发.*任务|制作.*任务|任务.*系统|任务.*奖励'; then
+if [ "$REVIEW_REQUEST" != "true" ] && [ "$PLACEHOLDER_ASSET_REQUEST" != "true" ] && [ "$CHECK_INTENT_REQUEST" != "true" ] && prompt_matches 'implement[[:space:]]+(this|the|a|an)?[[:space:]]*(feature|change|system|mechanic|ui)|code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色|完成.*功能|完成.*系统|完成.*菜单|完成.*界面|完成.*UI|完成.*脚本|完成.*代码|完成.*玩法|完成.*关卡|完成.*模块|完成.*组件|任务系统|任务奖励|任务玩法|任务逻辑|任务功能|任务界面|任务UI|任务数据|任务链|任务目标|任务进度|任务追踪|任务完成|任务提交|任务领取|任务触发|任务条件|任务面板|任务脚本|任务管理器|实现.*任务|修复.*任务|添加.*任务|开发.*任务|制作.*任务|任务.*系统|任务.*奖励'; then
   add_hint "This looks like focused implementation work. Consider gamekit-build and game-code-worker."
 fi
 
@@ -174,7 +224,13 @@ if [ "$REVIEW_FIX_REQUEST" = "true" ]; then
   add_hint "This asks to address review feedback. Return to the main development workflow with gamekit-build or game-code-worker; do not use code-reviewer unless the user asks for a new review."
 fi
 
-if prompt_matches 'check|test|validate|verify|verification|qa|risk|safe|problem|bug|regression|serialization|missing reference|manual test|playtest|debug|crash|log|检查|测试|验证|风险|安全|有没有问题|有问题吗|哪里有问题|检查.*问题|验证.*问题|测试.*问题|排查.*问题|问题排查|回归|引用丢失|手动测试|调试|排查|崩溃|日志'; then
+if [ "$CHECK_COMMAND_REQUEST" = "true" ] && [ "$CHECK_READONLY_REQUEST" = "true" ]; then
+  add_hint "This is an explicit read-only /gamekit-check request. Use gamekit-check for validation or triage only; do not use Safe Auto-Fix Escalation."
+elif [ "$CHECK_COMMAND_REQUEST" = "true" ] && [ "$DIRECT_FIX_REQUEST" = "true" ] && [ "$REVIEW_FIX_REQUEST" != "true" ]; then
+  add_hint "Explicit /gamekit-check may use Safe Auto-Fix Escalation if the safety contract holds: gamekit-check -> gamekit-build Direct Fix Mode -> gamekit-check validation."
+elif [ "$DIRECT_FIX_REQUEST" = "true" ] && [ "$REVIEW_FIX_REQUEST" != "true" ]; then
+  add_hint "This looks like a Direct Fix Candidate. Use gamekit-build for one narrow fix, then gamekit-check for validation."
+elif [ "$CHECK_INTENT_REQUEST" = "true" ]; then
   add_hint "This asks for verification or risk review. Consider gamekit-check and game-qa-checker."
 fi
 

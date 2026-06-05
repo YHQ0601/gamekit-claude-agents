@@ -70,7 +70,7 @@ Workflow routing:
 
 - Use `gamekit-plan` for ambiguous or multi-part requests before implementation. It should include a compact engineering preflight, add concise planning notes for reuse, cleanup, alternatives, and concrete risks when complexity warrants it, and decide whether subagents are useful.
 - Use `gamekit-ask` for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability. Use its Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed advice.
-- Use `gamekit-check` after behavior-affecting changes or for debug triage. It validates risks but does not implement fixes.
+- Use `gamekit-check` after behavior-affecting changes or for debug triage. It validates risks; explicit `/gamekit-check` may use Safe Auto-Fix Escalation for one `Direct Fix Candidate` via `gamekit-build`, then return to check validation.
 - Use `gamekit-review` only for explicit review requests. It is read-only and findings-first.
 - Mixed placeholder asset plus integration work must be sequenced: use `gamekit-assets` or `placeholder-asset-worker` for placeholder creation first, then `gamekit-build` for code/data/UnitDef/prefab/scene integration and validation.
 

@@ -68,6 +68,8 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 - Prefer ScriptableObject or existing config patterns for skills, items, characters, levels, and balance data.
 - Do not store runtime combat state in ScriptableObjects unless the project already does so intentionally.
 - For Unity UI, prefer authored prefabs or scene UI hierarchies with `[SerializeField] private` references over building full UI layouts at runtime. Runtime code may update state, bind events, toggle visibility, and instantiate known item or row prefabs into existing containers, but should not construct the primary UI structure from scratch unless explicitly requested or already established by the project.
+- UI components should only render lightweight ViewData and handle local interaction. They must not directly query config tables, save data, services, global singletons, root contexts, or gameplay managers.
+- Build UI ViewData in a page, system, coordinator, Builder, or Provider layer before passing it into reusable components. Reused components should keep one stable ViewData input shape; scene-specific differences belong in the Builder/Provider, not in main-menu/battle/preview branches inside the component.
 - Avoid fragile runtime scene/UI wiring such as `GameObject.Find(...)`, `transform.Find(...)`, `GetComponent("...")`, and repeated scene-wide discovery.
 - Cache type-safe `GetComponent<T>()` calls when they are repeated or used from hot paths.
 - Keep `Update`, `LateUpdate`, `FixedUpdate`, coroutines, animation callbacks, and render callbacks bounded; avoid avoidable allocations, LINQ churn, string formatting, and scene-wide searches there.
@@ -78,6 +80,7 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 - Prefer one composition root per feature, prefab, or scene. Put Inspector references there, validate them there, and use it to initialize child systems.
 - Dependencies should flow from the root/coordinator into focused components. Avoid child components holding a broad root/context reference just to fetch unrelated systems.
 - Components should receive only what they need, through explicit `Initialize(...)` methods or narrowly scoped serialized fields. Do not turn context/root objects into service locators.
+- UI dependencies should flow from page/coordinator/provider code into focused UI components. Reusable child UI components should not fetch global state or branch on scene-specific business modes.
 - Do not use `SendMessage`, `BroadcastMessage`, reflection, or string method names for core gameplay/application flow. Use typed C# events, explicit references, or interfaces.
 - Event producers own and invoke events. Consumers subscribe/unsubscribe explicitly. Producers should not know about optional UI, debug, analytics, VFX, audio, or presentation consumers.
 - Optional debug/UI/presentation components should consume state and events. Core gameplay should still run if those optional consumers are disabled or removed.
