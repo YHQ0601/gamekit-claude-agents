@@ -61,7 +61,7 @@ Use these role names consistently across tools:
 
 Workflow routing:
 
-- `gamekit-plan`: use before ambiguous or multi-part implementation work. It should include a compact engineering preflight, add concise planning notes for reuse, cleanup, alternatives, and concrete risks when complexity warrants it, and decide whether subagents are useful.
+- `gamekit-plan`: use before ambiguous or multi-part implementation work. It should include a compact engineering preflight, add concise planning notes for reuse, cleanup, alternatives, and concrete risks when complexity warrants it, decide whether subagents are useful, and choose validation depth without defaulting every plan to `gamekit-check`.
 - `gamekit-ask`: use for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability. Use its Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed advice.
 - `gamekit-check`: use after behavior-affecting changes or for debug triage. It validates risks; explicit `/gamekit-check` may use Safe Auto-Fix Escalation for one `Direct Fix Candidate` via `gamekit-build`, then return to check validation.
 - `gamekit-review`: use only for explicit review requests. It remains read-only and findings-first.

@@ -68,7 +68,7 @@ Do not ask the user to manually tag agents unless routing is ambiguous.
 
 Workflow routing:
 
-- Use `gamekit-plan` for ambiguous or multi-part requests before implementation. It should include a compact engineering preflight, add concise planning notes for reuse, cleanup, alternatives, and concrete risks when complexity warrants it, and decide whether subagents are useful.
+- Use `gamekit-plan` for ambiguous or multi-part requests before implementation. It should include a compact engineering preflight, add concise planning notes for reuse, cleanup, alternatives, and concrete risks when complexity warrants it, decide whether subagents are useful, and choose validation depth without defaulting every plan to `gamekit-check`.
 - Use `gamekit-ask` for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability. Use its Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed advice.
 - Use `gamekit-check` after behavior-affecting changes or for debug triage. It validates risks; explicit `/gamekit-check` may use Safe Auto-Fix Escalation for one `Direct Fix Candidate` via `gamekit-build`, then return to check validation.
 - Use `gamekit-review` only for explicit review requests. It is read-only and findings-first.

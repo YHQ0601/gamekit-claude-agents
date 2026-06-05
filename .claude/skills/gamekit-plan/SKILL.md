@@ -19,7 +19,15 @@ Purpose: decide the safest small implementation path before work starts. This wo
 8. Identify the smallest useful slice.
 9. Choose required workstreams and decide whether subagents are useful. Simple work should stay local.
 10. If risks are high, several approaches are close, or the approach depends on third-party APIs, plugins, performance conventions, or uncertain architecture practice, use `gamekit-ask` for evidence-backed consultation or read-only `architecture-reviewer` before implementation.
-11. Decide whether implementation should start or whether user input is needed.
+11. Choose validation depth for the eventual work. Do not default every plan to `gamekit-check`; recommend it only when risk, user intent, or the affected surface warrants it.
+12. Decide whether implementation should start or whether user input is needed.
+
+## Validation Depth
+
+- `none`: discussion, task splitting, planning, or no implementation.
+- `build-local`: clear small fix or local code change; `gamekit-build` should run the smallest relevant validation.
+- `gamekit-check`: behavior, configuration, UI, asset reference, Unity serialized, prefab/scene/ScriptableObject, or multi-file risk.
+- `gamekit-check + game-qa-checker`: multi-system, high-risk, pre-commit, handoff, release, or user-requested QA.
 
 ## Output Format
 
@@ -50,3 +58,5 @@ Mention whether to use `architecture-reviewer`, `game-code-worker`, `placeholder
 ## Start Decision / Questions
 
 Yes / No / Need user decision
+
+Validation Depth: none / build-local / gamekit-check / gamekit-check + game-qa-checker
