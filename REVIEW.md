@@ -18,6 +18,16 @@ Focus on issues the author would likely fix:
 6. Hot-path performance, allocation, render loop, tick/update, or loading regressions
 7. Missing tests or manual checks only when they hide a concrete risk
 
+Maintainability Lens:
+
+- Scope drift: the diff changes behavior outside the requested review scope or task intent.
+- Duplicate / reuse risk: new code, data, assets, or wiring repeats an existing local pattern instead of reusing it, creating behavior divergence, maintenance cost, missed validation, or migration risk.
+- Parallel path: old and new code paths, configs, entry points, references, or assets remain active for the same behavior.
+- Ownership / source of truth: logic, runtime state, data, lifecycle, or validation moves into the wrong owner/layer or bypasses the existing source of truth.
+- Cleanup residue: obsolete fields, registrations, references, assets, config, temporary code, or TODOs remain in a way that can cause behavior splits, misuse, missing references, or maintenance risk.
+- Validation mismatch: the recommended or performed validation does not cover the actual changed surface.
+- Behavior contract regression: the diff changes existing inputs, outputs, lifecycle, event order, serialized contracts, or gameplay assumptions without an explicit migration or validation path.
+
 For Unity review scope, also check affected `Assets/`, `ProjectSettings/`, `Packages/manifest.json`, `.asmdef`, `.unity`, `.prefab`, `.asset`, and `.meta` changes for Missing Script, Missing Reference, serialized field migration, editor-only API, package/input/render pipeline, Addressables, prefab variant, scene, and ScriptableObject reference risks.
 
 For Unity `.prefab`, `.unity`, or `.asset` review, use `gamekit-unity-yaml-context` before reading full serialized YAML unless the diff itself already provides enough evidence.
@@ -35,6 +45,8 @@ Report a finding only when it is:
 
 Do not report low-confidence speculation, broad preferences, or generic best-practice advice.
 
+For duplicate/reuse findings, cite the existing reusable path or the specific new/old parallel paths. For ownership or architecture findings, name the bypassed owner, layer, or source of truth. For cleanup findings, explain how the residue can be used accidentally, diverge behavior, or break references.
+
 ## Boundaries
 
 - Review only. Do not edit files.
@@ -51,6 +63,16 @@ Do not report low-confidence speculation, broad preferences, or generic best-pra
 ## Output
 
 When used as a local review workflow, report:
+
+## Review Summary
+
+Scope:
+
+Engine:
+
+Verdict: Pass / Risky / Incorrect
+
+Top Risks: list 1-3 terse risks or `None`
 
 ## Findings
 
@@ -70,18 +92,12 @@ Use this shape for every actionable finding:
 
 If there are no actionable findings, write `No actionable findings.`
 
-## Risk Level
+## Validation
 
-Low / Medium / High / Critical
+Recommended:
 
-## Review Scope / Engine
+Untested:
 
-## Validation Recommendation
+## Follow-up
 
-## Untested Areas
-
-## Overall Correctness
-
-Patch is correct / Patch is risky / Patch is incorrect
-
-## Memory / Knowledge Recommendation
+Memory / Knowledge:

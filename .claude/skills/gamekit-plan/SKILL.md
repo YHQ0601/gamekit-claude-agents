@@ -1,11 +1,11 @@
 ---
 name: gamekit-plan
-description: Use this skill at the start of ambiguous or multi-part game development requests to classify the goal, run a compact engineering preflight, decide whether the work is necessary now, identify the smallest useful version, determine the active engine profile, choose workstreams and subagents, and decide whether implementation should start.
+description: Use this skill at the start of ambiguous or multi-part game development requests to classify the goal, run a compact engineering preflight, decide whether the work is necessary now, identify the smallest useful version, check reuse/cleanup/alternatives/risks when complexity warrants it, choose workstreams and subagents, and decide whether implementation should start.
 ---
 
 # gamekit-plan
 
-Purpose: decide the safest small implementation path before work starts.
+Purpose: decide the safest small implementation path before work starts. This workflow is read-only: it plans, routes, and asks questions, but does not implement, clean up, or edit task cards.
 
 ## Workflow
 
@@ -13,10 +13,13 @@ Purpose: decide the safest small implementation path before work starts.
 2. Identify the active engine profile from project evidence or user intent.
 3. Classify the request and decide whether it is necessary now.
 4. Run a compact engineering preflight: compatibility, coupling, stability/regression, performance, production cost, and testability.
-5. Identify the smallest useful slice.
-6. Choose required workstreams and decide whether subagents are useful. Simple work should stay local.
-7. If risks are high, several approaches are close, or the approach depends on third-party APIs, plugins, performance conventions, or uncertain architecture practice, use `gamekit-ask` for evidence-backed consultation or read-only `architecture-reviewer` before implementation.
-8. Decide whether implementation should start or whether user input is needed.
+5. Add Planning Notes when the task is ambiguous, multi-file, multi-system, serialized-data-heavy, architecture-sensitive, task-splitting work, or when the user asks about reuse, cleanup, better approaches, alternatives, or risk. Use targeted repository inspection before broad scanning.
+6. Keep simple bug fixes and small explicit tasks light: Planning Notes may be one short line and the plan may recommend going directly to `gamekit-build`.
+7. If the user asks for official guidance, references, latest/current practice, community practice, literature, or evidence-backed advice, use `gamekit-ask` Research Mode first; then return to `gamekit-plan` only if scope, workstreams, or start decision are still unclear.
+8. Identify the smallest useful slice.
+9. Choose required workstreams and decide whether subagents are useful. Simple work should stay local.
+10. If risks are high, several approaches are close, or the approach depends on third-party APIs, plugins, performance conventions, or uncertain architecture practice, use `gamekit-ask` for evidence-backed consultation or read-only `architecture-reviewer` before implementation.
+11. Decide whether implementation should start or whether user input is needed.
 
 ## Output Format
 
@@ -25,6 +28,18 @@ Purpose: decide the safest small implementation path before work starts.
 ## Engineering Preflight
 
 Include active engine profile, necessity, compatibility, coupling, stability/regression, performance, production cost, and testability. Keep it concise.
+
+## Planning Notes
+
+Include reuse, cleanup, alternative, and concrete risk sources. For simple tasks, compress this to one line; for complex tasks, keep it short but specific.
+
+Reuse:
+
+Cleanup:
+
+Alternative:
+
+Risk Sources:
 
 ## Smallest Useful Slice
 

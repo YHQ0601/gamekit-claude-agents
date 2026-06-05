@@ -2,8 +2,23 @@
 set -euo pipefail
 
 INPUT="$(cat)"
-if command -v jq >/dev/null 2>&1; then
-  PROMPT="$(printf '%s' "$INPUT" | jq -r '.prompt // ""' 2>/dev/null || printf '%s' "$INPUT")"
+
+extract_prompt_with_python() {
+  python -c 'import json, sys; data = sys.stdin.read(); parsed = json.loads(data); value = parsed.get("prompt", "") if isinstance(parsed, dict) else data; sys.stdout.buffer.write(("" if value is None else str(value)).encode("utf-8"))' 2>/dev/null
+}
+
+extract_prompt_with_jq() {
+  if command -v jq >/dev/null 2>&1; then
+    jq -r '.prompt // ""' 2>/dev/null
+  else
+    return 1
+  fi
+}
+
+if command -v python >/dev/null 2>&1; then
+  PROMPT="$(printf '%s' "$INPUT" | extract_prompt_with_python || printf '%s' "$INPUT" | extract_prompt_with_jq || printf '%s' "$INPUT")"
+elif command -v jq >/dev/null 2>&1; then
+  PROMPT="$(printf '%s' "$INPUT" | extract_prompt_with_jq || printf '%s' "$INPUT")"
 else
   PROMPT="$INPUT"
 fi
@@ -19,7 +34,7 @@ prompt_matches() {
 }
 
 brief_engine() {
-  if [ -f "docs/knowledge/PROJECT_BRIEF.md" ]; then
+  if [ -f "docs/ai/PROJECT_BRIEF.md" ]; then
     awk '
       BEGIN { in_engine_section = 0 }
       /^[[:space:]]*Engine[[:space:]]*:/ {
@@ -42,7 +57,7 @@ brief_engine() {
         print value
         exit
       }
-    ' docs/knowledge/PROJECT_BRIEF.md
+    ' docs/ai/PROJECT_BRIEF.md
   fi
 }
 
@@ -129,14 +144,12 @@ if prompt_matches 'gamekit-task|task-card-manager|task card|docs/tasks|claim tas
   add_hint "This looks like task-card workflow. Consider gamekit-task and task-card-manager; read docs/templates/TASK_TEMPLATE.md and relevant docs/tasks/** task cards, and do not claim a task unless the user explicitly asks."
 fi
 
-if [ "$REVIEW_REQUEST" != "true" ] && prompt_matches 'implement[[:space:]]+(this|the|a|an)?[[:space:]]*(feature|change|system|mechanic|ui)|code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色|完成.*功能|完成.*系统|完成.*菜单|完成.*界面|完成.*UI|完成.*脚本|完成.*代码|完成.*玩法|完成.*关卡|完成.*模块|完成.*组件|任务系统|任务奖励|任务玩法|任务逻辑|任务功能|任务界面|任务UI|任务数据|任务链|任务目标|任务进度|任务追踪|任务完成|任务提交|任务领取|任务触发|任务条件|任务面板|任务脚本|任务管理器|实现.*任务|修复.*任务|添加.*任务|开发.*任务|制作.*任务|任务.*系统|任务.*奖励'; then
-  if [ "$PLACEHOLDER_ASSET_REQUEST" != "true" ]; then
-    add_hint "This looks like focused implementation work. Consider gamekit-build and game-code-worker."
-  fi
+if [ "$REVIEW_REQUEST" != "true" ] && [ "$PLACEHOLDER_ASSET_REQUEST" != "true" ] && prompt_matches 'implement[[:space:]]+(this|the|a|an)?[[:space:]]*(feature|change|system|mechanic|ui)|code|script|component|gameplay|combat|inventory|quest|level|spawn|controller|manager|compile|build|error|exception|input|ui logic|ability|item|character|代码|脚本|玩法|战斗|背包|关卡|生成|控制器|管理器|编译|构建|报错|输入|技能|道具|角色|完成.*功能|完成.*系统|完成.*菜单|完成.*界面|完成.*UI|完成.*脚本|完成.*代码|完成.*玩法|完成.*关卡|完成.*模块|完成.*组件|任务系统|任务奖励|任务玩法|任务逻辑|任务功能|任务界面|任务UI|任务数据|任务链|任务目标|任务进度|任务追踪|任务完成|任务提交|任务领取|任务触发|任务条件|任务面板|任务脚本|任务管理器|实现.*任务|修复.*任务|添加.*任务|开发.*任务|制作.*任务|任务.*系统|任务.*奖励'; then
+  add_hint "This looks like focused implementation work. Consider gamekit-build and game-code-worker."
 fi
 
-if prompt_matches 'plan|design|scope|should we|worth it|requirement|feature request|unclear|break down|方案|计划|范围|要不要|是否值得|需求|不明确|拆分'; then
-  add_hint "This may need task classification. Consider gamekit-plan before implementation."
+if prompt_matches 'plan|design|scope|should we|worth it|requirement|feature request|unclear|break down|better approach|better way|alternative|reuse|cleanup|clean up|old code|legacy code|existing code|risk source|risk point|方案|计划|规划|范围|要不要|是否值得|需求|不明确|拆分|更好做法|更好方案|更合理|复用|旧代码|老代码|已有代码|清理|风险点|风险来源'; then
+  add_hint "This may need task classification or planning notes. Consider gamekit-plan before implementation, especially for reuse, cleanup, alternatives, and concrete risk sources."
 fi
 
 if prompt_matches 'architecture|refactor|system boundary|data model|save data|economy|networking|performance|extensible|scalable|abstraction|maintainability|架构|重构|系统边界|数据模型|存档|经济|网络|性能|扩展性|抽象|可维护'; then
@@ -165,20 +178,8 @@ if prompt_matches 'check|test|validate|verify|verification|qa|risk|safe|problem|
   add_hint "This asks for verification or risk review. Consider gamekit-check and game-qa-checker."
 fi
 
-if prompt_matches 'handoff|summary|summarize|continue later|session state|project memory|memory update|update memory|remember this|document decision|what changed|next step|stale|交接|总结|下次继续|会话状态|记忆|记录决策|决策记录|改了什么|下一步|过期信息'; then
-  add_hint "This looks like continuity or project memory work. Consider gamekit-handoff and project-memory-curator; update session state first and only propose shared knowledge updates."
-fi
-
-if prompt_matches 'git push|pre-push|prepush|push[[:space:]]+((this|the)[[:space:]]+)?(branch|commits?|to origin)|publish[[:space:]]+((this|the)[[:space:]]+)?(branch|release)|release branch|ship branch'; then
-  add_hint "This looks like a push/publish checkpoint. Run a lightweight knowledge gate: check system boundaries, main flows, config/prefab/scene wiring, public conventions, ADR needs, and docs/knowledge stale status. Do not install a hard Git hook."
-fi
-
-if prompt_matches 'system card|stable system|system boundary|entry point|main flow|public convention|prefab.*wiring|scene.*wiring|config.*flow|configuration.*flow'; then
-  add_hint "This may need a System Card update decision. Existing code-verified cards may be refreshed only during user-requested knowledge maintenance or an explicit knowledge gate; new System Cards need user confirmation."
-fi
-
-if prompt_matches 'architecture decision|technical decision|long-term decision|adr|accepted decision'; then
-  add_hint "This may need an ADR proposal. docs/decisions entries require user confirmation before writing."
+if prompt_matches 'handoff|summary|summarize|continue later|session state|project memory|memory update|update memory|remember this|document decision|adr|what changed|next step|stale|交接|总结|下次继续|会话状态|记忆|记录决策|决策记录|改了什么|下一步|过期信息'; then
+  add_hint "This looks like continuity or project memory work. Consider gamekit-handoff and project-memory-curator."
 fi
 
 ASK_EXPLICIT=false
@@ -190,7 +191,7 @@ if prompt_matches 'gamekit-ask|engineering consultation'; then
   ASK_EXPLICIT=true
 fi
 
-if prompt_matches 'official docs?|official guidance|official recommendation|best practices?|search|look up|web search|reference|reference material|community recommendation|community practice|latest|current practice|readme|examples?|do not rely on memory|without relying on memory|evidence-backed|联网|搜索|搜一下|查资料|查一下|官方|官方建议|社区推荐|最佳实践|参考资料|参考文档|不要只靠认知|不要凭记忆|最新|文档|示例'; then
+if prompt_matches 'official docs?|official guidance|official recommendation|best practices?|search|look up|web search|reference|reference material|literature|sources?|community recommendation|community practice|latest|current practice|readme|examples?|do not rely on memory|without relying on memory|evidence-backed|联网|搜索|搜一下|查资料|查一下|官方|官方建议|社区推荐|社区实践|最佳实践|参考资料|参考文档|文献|资料来源|来源|不要只靠认知|不要凭记忆|最新|文档|示例'; then
   ASK_RESEARCH_INTENT=true
 fi
 
@@ -204,8 +205,8 @@ fi
 
 if [ "$ASK_EXPLICIT" = "true" ]; then
   add_hint "This explicitly asks for gamekit-ask. Use read-only engineering consultation; use Research Mode when evidence is requested."
-elif [ "$REVIEW_REQUEST" != "true" ] && [ "$ASK_RESEARCH_INTENT" = "true" ] && [ "$ASK_ENGINEERING_TARGET" = "true" ]; then
-  add_hint "This asks for evidence-backed engineering consultation. Use gamekit-ask Research Mode first; if implementation is also requested, return to gamekit-build after the recommendation."
+elif [ "$REVIEW_REQUEST" != "true" ] && [ "$ASK_RESEARCH_INTENT" = "true" ] && { [ "$ASK_ENGINEERING_TARGET" = "true" ] || [ "$ASK_CONSULTATION_INTENT" = "true" ]; }; then
+  add_hint "This asks for evidence-backed engineering consultation. Use gamekit-ask Research Mode first; if planning is also needed, return to gamekit-plan after the recommendation."
 elif [ "$REVIEW_REQUEST" != "true" ] && [ "$ASK_CONSULTATION_INTENT" = "true" ] && [ "$ASK_ENGINEERING_TARGET" = "true" ]; then
   add_hint "This looks like pre-implementation engineering consultation. Consider gamekit-ask; use gamekit-plan when scope, workstreams, or start decision are still unclear."
 fi

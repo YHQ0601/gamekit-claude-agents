@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/bootstrap-session.sh"
+            "command": "sh .claude/hooks/bootstrap-session.sh"
           }
         ]
       }
@@ -15,7 +15,18 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/route-user-prompt.sh"
+            "command": "sh .claude/hooks/route-user-prompt.sh"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(*)",
+            "command": "sh .claude/hooks/auto-approve-safe-cd.sh"
           }
         ]
       }

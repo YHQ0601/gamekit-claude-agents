@@ -2,7 +2,7 @@
 
 This repository is a Claude-first game development workflow scaffold for Claude Code, Codex, opencode, and compatible agent tools.
 
-The current repository code, engine assets, scenes/prefabs, and configuration are the source of truth for their actual state. Project knowledge files are navigation aids, not proof that a gameplay system exists.
+The current repository code is the source of truth. Project knowledge files are navigation aids, not proof that a gameplay system exists.
 
 ## Tool Entry Points
 
@@ -61,7 +61,7 @@ Use these role names consistently across tools:
 
 Workflow routing:
 
-- `gamekit-plan`: use before ambiguous or multi-part implementation work. It should include a compact engineering preflight and decide whether subagents are useful.
+- `gamekit-plan`: use before ambiguous or multi-part implementation work. It should include a compact engineering preflight, add concise planning notes for reuse, cleanup, alternatives, and concrete risks when complexity warrants it, and decide whether subagents are useful.
 - `gamekit-ask`: use for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability. Use its Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed advice.
 - `gamekit-check`: use after behavior-affecting changes or for debug triage. It validates risks but does not implement fixes.
 - `gamekit-review`: use only for explicit review requests. It remains read-only and findings-first.
@@ -98,14 +98,18 @@ Use `project-memory-curator` proactively at these checkpoints:
 
 ## Task Cards
 
-`docs/tasks/` is the shared parent/child task queue. Use `vNN-short-milestone-name/README.md` for parent milestones and `vNN-tMM-verb-object.md` for executable child tasks.
+`docs/tasks/` is the shared parent/child task queue. Milestones live at `docs/tasks/vNN-short-milestone-name/README.md`, and executable child tasks live beside them as `vNN-tMM-verb-object.md`.
 
 - Session start may list open task cards with `Status: Todo`, `Status: In Progress`, or `Status: Blocked`.
 - Use `gamekit-task` and `task-card-manager` for manual task-card authoring and queue maintenance.
 - Task-card work should prepare executable work orders for later agents or cheaper models; it is not implementation.
-- Parent README files should define the milestone goal, child order, dependencies, phase gates, user confirmation points, shared boundaries, and final validation strategy.
-- Child task cards should include a single-node goal, executor summary, checkbox subtasks mapped to acceptance criteria, implementation notes, executor permissions, halt conditions, validation method, and execution record sections.
-- Child task cards should reference the parent README instead of copying long milestone background, and should not lock interfaces or APIs unless code or user requirements already do.
+- Use `docs/templates/TASK_TEMPLATE.md` to choose the parent README or child task template when creating task cards.
+- Parent README files should define milestone goals, child task order, phase gates, shared boundaries, and final validation strategy.
+- Child task cards should focus on one executable node and include executor summary, local scope, file ownership, acceptance criteria, checkbox subtasks, implementation notes, executor permissions, halt conditions, validation method, and execution record sections.
+- Do not copy long parent milestone background into every child task. Child tasks should reference the parent README for shared guardrails.
+- Child coding tasks should describe behavior, integration targets, risks, and what must not break; do not lock concrete interfaces, class names, or method signatures unless existing code or the user already requires them.
+- Child placeholder or art tasks should define visible output, naming, hierarchy, color, state feedback, and replacement standards.
+- Child QA tasks should state how to run checks, what to observe, and what to record on failure.
 - Do not claim or start a task automatically.
 - Claim a task only when the user names a task card or explicitly asks for the next task.
 - When claiming a task, set `Status: In Progress` and fill `Owner Agent` when editing the task card is allowed.
@@ -117,13 +121,9 @@ Use `project-memory-curator` proactively at these checkpoints:
 
 ## Knowledge Update Policy
 
-- `docs/knowledge/` is the canonical shared project knowledge entry. Keep it as a short navigation index, not a complete fact database.
 - Local session state should be updated aggressively when facts are verified in code or explicitly confirmed by the user.
-- Existing System Cards under `docs/systems/` may be refreshed only when the user explicitly asks for knowledge maintenance or runs a knowledge gate, and the changes are code-verified and scoped to stable entry points. New System Cards require user confirmation or an explicit knowledge gate.
-- ADRs under `docs/decisions/` require user confirmation before writing. Review, check, and push gates may propose ADRs but must not silently create accepted decisions.
-- Handoff updates `.claude-local/SESSION_STATE.md` first and only proposes shared knowledge updates.
-- Push, pre-push, and publish requests should trigger a lightweight knowledge gate recommendation; do not add hard Git hooks by default.
-- Shared knowledge updates should be proposed, not silently applied, for `docs/knowledge/*`, new `docs/systems/*`, `docs/decisions/*`, and skill documentation.
+- Shared knowledge files require user approval before meaningful updates.
+- Shared knowledge updates should be proposed, not silently applied, for `docs/ai/*`, `docs/systems/*`, `docs/decisions/*`, and skill documentation.
 - User-confirmed designs should be recorded as approved design facts. If a design is not implemented yet, label it as approved but not code-verified.
 
 When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/templates/SESSION_STATE_TEMPLATE.md` as the tracked template. Suggested sections:
@@ -141,7 +141,7 @@ When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/template
 
 ## Context Budget
 
-- Prefer structured project context before broad scanning: `.claude-local/SESSION_STATE.md`, `docs/knowledge/PROJECT_BRIEF.md`, `docs/knowledge/KNOWLEDGE_INDEX.md`, relevant system cards, then targeted files.
+- Prefer structured project context before broad scanning: `.claude-local/SESSION_STATE.md`, `docs/ai/PROJECT_BRIEF.md`, `docs/ai/ARCHITECTURE_INDEX.md`, relevant system cards, then targeted files.
 - Read index files, templates, and relevant examples before expanding to broad search.
 - Do not read too many large files before summarizing.
 - For Unity `.prefab`, `.unity`, and `.asset` files, use the canonical `.claude/skills/gamekit-unity-yaml-context/SKILL.md` workflow to generate a compact Markdown summary before reading raw YAML.

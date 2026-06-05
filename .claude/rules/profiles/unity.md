@@ -62,6 +62,7 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 
 ## C# Rules
 
+- **Inspector 中拖入预制体引用时，应从 Project 窗口拖入而非 Hierarchy/预制体内部实例。** 内部实例引用在 Instantiate 后会导致子节点状态异常（不可见/被关闭）。当字段需要引用 Project 预制体资产时，运行时应加 `gameObject.scene.IsValid()` 检测并输出 Warning 提示。
 - Prefer `[SerializeField] private` fields over public mutable fields for Inspector references.
 - Be careful when renaming serialized fields; use a migration strategy such as `FormerlySerializedAs` when serialized data must survive the rename.
 - Prefer ScriptableObject or existing config patterns for skills, items, characters, levels, and balance data.
