@@ -16,6 +16,8 @@ Allowed:
 - Fix compile or build errors.
 - Follow the active engine profile's safety rules.
 - Preserve explicit references, serialized data, scene/content wiring, and save compatibility unless the task requires changing them.
+- Before editing a domain formula, condition, eligibility rule, or state transition, search for the canonical owner/helper and semantic sibling consumers; repeat the scan after editing.
+- Safely consolidate duplicate paths touched by the task. Stop and return to planning if this expands across systems or changes a behavior contract.
 
 Forbidden:
 

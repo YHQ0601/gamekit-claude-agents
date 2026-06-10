@@ -25,11 +25,18 @@ For non-trivial implementation, quickly check these lenses before editing and ag
 
 Prefer the smallest design that passes these checks. If a lens exposes meaningful risk, simplify the approach or use `architecture-reviewer` before implementation.
 
+## Domain Invariant Gate
+
+- Before changing a domain formula, condition, eligibility rule, or state transition, search for its canonical owner/helper and semantic sibling consumers.
+- Reuse or extend the canonical owner. Express intentional differences with a named policy or parameter instead of copying the rule inline.
+- Safely consolidate duplicate paths touched by the task; return to planning if consolidation expands across systems or changes a behavior contract.
+- Abstract only behavior that should change together. Do not create abstractions from incidental textual similarity.
+
 ## Engine Profile
 
 - Identify the active engine or runtime before implementation.
 - Load the relevant profile from `.claude/rules/profiles/` when engine-specific files or workflows are involved.
-- If the engine is unknown, inspect repository structure and `docs/knowledge/PROJECT_BRIEF.md`; keep assumptions as `TBD`.
+- If the engine is unknown, inspect repository structure and `docs/ai/PROJECT_BRIEF.md`; keep assumptions as `TBD`.
 - In mixed-engine repositories, scope changes to the explicitly requested runtime.
 
 ## Gameplay Data

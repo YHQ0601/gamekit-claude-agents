@@ -20,7 +20,7 @@ When the active tool supports subagents, the main agent must delegate the review
 5. Load exactly one `.claude/rules/profiles/*.md` when the reviewed changes are engine-specific.
 6. Inspect the diff before reading wider context.
 7. Flag only actionable issues introduced by the reviewed changes.
-8. Apply the Maintainability Lens below to catch concrete reuse, duplication, architecture, cleanup, validation, and behavior-contract risks.
+8. Apply the canonical Maintainability Lens and Finding Quality Gate from `REVIEW.md`.
 9. Prioritize findings by impact and likelihood.
 10. Provide advisory per-finding fix plans and validation recommendations.
 11. For eligible Unity C#-only changes, recommend the Unity profile's `C# compile-layer proxy check` only as a proxy check, not as Unity validation.
@@ -29,28 +29,9 @@ When the active tool supports subagents, the main agent must delegate the review
 
 ## Finding Criteria
 
-Report findings that affect:
+Use the Review Priorities, Maintainability Lens, and Finding Quality Gate in `REVIEW.md`. Each finding must be introduced or exposed by the reviewed change, actionable, and backed by a concrete affected path or runtime/editor scenario.
 
-- correctness or gameplay behavior;
-- engine assets, scenes, prefabs, nodes, blueprints, resources, packages, or serialized references;
-- save data, schema, migration, networking, economy, or compatibility;
-- build, packaging, dependency, platform, or runtime behavior;
-- hot-path performance, allocation, render loop, tick/update, or loading behavior;
-- missing validation when a concrete risk is otherwise hidden.
-
-Maintainability Lens:
-
-- Scope drift: the diff changes behavior outside the requested review scope or task intent.
-- Duplicate / reuse risk: new code, data, assets, or wiring repeats an existing local pattern instead of reusing it, creating behavior divergence, maintenance cost, missed validation, or migration risk.
-- Parallel path: old and new code paths, configs, entry points, references, or assets remain active for the same behavior.
-- Ownership / source of truth: logic, runtime state, data, lifecycle, or validation moves into the wrong owner/layer or bypasses the existing source of truth.
-- Cleanup residue: obsolete fields, registrations, references, assets, config, temporary code, or TODOs remain in a way that can cause behavior splits, misuse, missing references, or maintenance risk.
-- Validation mismatch: the recommended or performed validation does not cover the actual changed surface.
-- Behavior contract regression: the diff changes existing inputs, outputs, lifecycle, event order, serialized contracts, or gameplay assumptions without an explicit migration or validation path.
-
-Each finding must be introduced or exposed by the reviewed change and must identify a concrete affected path, code path, asset path, scene path, or runtime/editor scenario. Do not report low-confidence issues, broad preferences, or risks that are not actionable.
-
-For duplicate/reuse findings, cite the existing reusable path or the specific new/old parallel paths. For ownership or architecture findings, name the bypassed owner, layer, or source of truth. For cleanup findings, explain how the residue can be used accidentally, diverge behavior, or break references.
+For domain-invariant findings, name the canonical owner, omitted semantic sibling path, and behavior divergence risk. Do not flag incidental textual similarity when the behaviors need not change together.
 
 Avoid:
 

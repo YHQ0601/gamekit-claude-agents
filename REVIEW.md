@@ -21,7 +21,7 @@ Focus on issues the author would likely fix:
 Maintainability Lens:
 
 - Scope drift: the diff changes behavior outside the requested review scope or task intent.
-- Duplicate / reuse risk: new code, data, assets, or wiring repeats an existing local pattern instead of reusing it, creating behavior divergence, maintenance cost, missed validation, or migration risk.
+- Duplicate / invariant risk: a formula, condition, eligibility rule, state transition, data path, asset, or wiring duplicates or bypasses its canonical owner, allowing semantic sibling consumers to diverge.
 - Parallel path: old and new code paths, configs, entry points, references, or assets remain active for the same behavior.
 - Ownership / source of truth: logic, runtime state, data, lifecycle, or validation moves into the wrong owner/layer or bypasses the existing source of truth.
 - Cleanup residue: obsolete fields, registrations, references, assets, config, temporary code, or TODOs remain in a way that can cause behavior splits, misuse, missing references, or maintenance risk.
@@ -45,7 +45,7 @@ Report a finding only when it is:
 
 Do not report low-confidence speculation, broad preferences, or generic best-practice advice.
 
-For duplicate/reuse findings, cite the existing reusable path or the specific new/old parallel paths. For ownership or architecture findings, name the bypassed owner, layer, or source of truth. For cleanup findings, explain how the residue can be used accidentally, diverge behavior, or break references.
+For duplicate/invariant findings, name the canonical owner, omitted sibling path, and concrete behavior divergence risk. Do not report incidental textual similarity when the behaviors need not change together. For ownership or architecture findings, name the bypassed owner, layer, or source of truth. For cleanup findings, explain how the residue can be used accidentally, diverge behavior, or break references.
 
 ## Boundaries
 

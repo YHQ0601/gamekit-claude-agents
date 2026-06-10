@@ -39,7 +39,7 @@ Include active engine profile, necessity, compatibility, coupling, stability/reg
 
 ## Planning Notes
 
-Include reuse, cleanup, alternative, and concrete risk sources. For simple tasks, compress this to one line; for complex tasks, keep it short but specific.
+Include reuse, cleanup, alternative, and concrete risk sources. For non-trivial domain logic, `Reuse` should name the canonical owner/helper and semantic sibling paths that must stay aligned. For simple tasks, compress this to one line; for complex tasks, keep it short but specific.
 
 Reuse:
 
