@@ -24,6 +24,8 @@ else
 fi
 
 HINTS=()
+RESEARCH_EXPLICIT=false
+EVIDENCE_REQUEST=false
 
 add_hint() {
   HINTS+=("$1")
@@ -32,6 +34,14 @@ add_hint() {
 prompt_matches() {
   printf '%s' "$PROMPT" | grep -Eqi "$1"
 }
+
+if prompt_matches '(^|[[:space:]])/?gamekit-research([[:space:]]|$)'; then
+  RESEARCH_EXPLICIT=true
+fi
+
+if prompt_matches 'official docs?|official guidance|official recommendation|best practices?|search|look up|web search|reference|reference material|literature|sources?|community recommendation|community practice|latest|current practice|readme|examples?|do not rely on memory|without relying on memory|evidence-backed|联网|搜索|搜一下|查资料|查一下|官方|官方建议|社区推荐|社区实践|最佳实践|参考资料|参考文档|文献|资料来源|来源|不要只靠认知|不要凭记忆|最新|文档|示例'; then
+  EVIDENCE_REQUEST=true
+fi
 
 prompt_py_readonly_intent() {
   command -v python >/dev/null 2>&1 || return 1
@@ -166,7 +176,7 @@ case "$(printf '%s' "$ENGINE" | tr '[:upper:]' '[:lower:]')" in
   web*|javascript*|js*) add_hint "Detected Web/JS profile. Load .claude/rules/profiles/web-js.md before engine-specific work." ;;
 esac
 
-if prompt_matches 'unity|c#|csharp|monobehaviour|scriptableobject|prefab|\.prefab|\.unity|projectsettings|unity editor|\.meta|预制体|Unity[[:space:]]*场景|组件|脚本'; then
+if [ "$RESEARCH_EXPLICIT" != "true" ] && [ "$EVIDENCE_REQUEST" != "true" ] && prompt_matches 'unity|c#|csharp|monobehaviour|scriptableobject|prefab|\.prefab|\.unity|projectsettings|unity editor|\.meta|预制体|Unity[[:space:]]*场景|组件|脚本'; then
   add_hint "This looks like Unity-specific work. Use .claude/rules/profiles/unity.md and consider game-code-worker or game-qa-checker."
 fi
 
@@ -230,7 +240,7 @@ elif [ "$CHECK_COMMAND_REQUEST" = "true" ] && [ "$DIRECT_FIX_REQUEST" = "true" ]
   add_hint "Explicit /gamekit-check may use Safe Auto-Fix Escalation if the safety contract holds: gamekit-check -> gamekit-build Direct Fix Mode -> gamekit-check validation."
 elif [ "$DIRECT_FIX_REQUEST" = "true" ] && [ "$REVIEW_FIX_REQUEST" != "true" ]; then
   add_hint "This looks like a Direct Fix Candidate. Use gamekit-build for one narrow fix, then gamekit-check for validation."
-elif [ "$CHECK_INTENT_REQUEST" = "true" ]; then
+elif [ "$CHECK_INTENT_REQUEST" = "true" ] && [ "$EVIDENCE_REQUEST" != "true" ]; then
   add_hint "This asks for verification or risk review. Consider gamekit-check and game-qa-checker."
 fi
 
@@ -239,16 +249,12 @@ if prompt_matches 'handoff|summary|summarize|continue later|session state|projec
 fi
 
 ASK_EXPLICIT=false
-ASK_RESEARCH_INTENT=false
+ASK_RESEARCH_INTENT="$EVIDENCE_REQUEST"
 ASK_ENGINEERING_TARGET=false
 ASK_CONSULTATION_INTENT=false
 
 if prompt_matches 'gamekit-ask|engineering consultation'; then
   ASK_EXPLICIT=true
-fi
-
-if prompt_matches 'official docs?|official guidance|official recommendation|best practices?|search|look up|web search|reference|reference material|literature|sources?|community recommendation|community practice|latest|current practice|readme|examples?|do not rely on memory|without relying on memory|evidence-backed|联网|搜索|搜一下|查资料|查一下|官方|官方建议|社区推荐|社区实践|最佳实践|参考资料|参考文档|文献|资料来源|来源|不要只靠认知|不要凭记忆|最新|文档|示例'; then
-  ASK_RESEARCH_INTENT=true
 fi
 
 if prompt_matches 'implementation|implementation approach|implementation strategy|architecture|performance|compatibility|coupling|api|plugin|sdk|package|repository|repo|framework|engine|production method|stability|testability|third-party|实现|实现方式|接入|架构|性能|兼容|耦合|API|接口|插件|SDK|包|仓库|框架|引擎|制作方式|稳定|可测试|第三方'; then
@@ -259,10 +265,14 @@ if prompt_matches 'better implementation|safer implementation|tradeoff|trade-off
   ASK_CONSULTATION_INTENT=true
 fi
 
-if [ "$ASK_EXPLICIT" = "true" ]; then
-  add_hint "This explicitly asks for gamekit-ask. Use read-only engineering consultation; use Research Mode when evidence is requested."
+if [ "$RESEARCH_EXPLICIT" = "true" ]; then
+  add_hint "This explicitly asks for gamekit-research. Use the isolated read-only web-researcher subagent and return sourced evidence."
+elif [ "$ASK_EXPLICIT" = "true" ]; then
+  add_hint "This explicitly asks for gamekit-ask. Apply its Evidence Gate; invoke gamekit-research and wait for the result when external evidence is required."
 elif [ "$REVIEW_REQUEST" != "true" ] && [ "$ASK_RESEARCH_INTENT" = "true" ] && { [ "$ASK_ENGINEERING_TARGET" = "true" ] || [ "$ASK_CONSULTATION_INTENT" = "true" ]; }; then
-  add_hint "This asks for evidence-backed engineering consultation. Use gamekit-ask Research Mode first; if planning is also needed, return to gamekit-plan after the recommendation."
+  add_hint "This asks for evidence-backed engineering consultation. Use gamekit-research for external evidence, then gamekit-ask for the recommendation."
+elif [ "$REVIEW_REQUEST" != "true" ] && [ "$ASK_RESEARCH_INTENT" = "true" ]; then
+  add_hint "This asks for external evidence. Use gamekit-research."
 elif [ "$REVIEW_REQUEST" != "true" ] && [ "$ASK_CONSULTATION_INTENT" = "true" ] && [ "$ASK_ENGINEERING_TARGET" = "true" ]; then
   add_hint "This looks like pre-implementation engineering consultation. Consider gamekit-ask; use gamekit-plan when scope, workstreams, or start decision are still unclear."
 fi

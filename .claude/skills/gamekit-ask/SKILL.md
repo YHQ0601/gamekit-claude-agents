@@ -1,6 +1,6 @@
 ---
 name: gamekit-ask
-description: Use this skill for read-only engineering consultation before implementation when the user asks how to build something more safely, compare implementation approaches, evaluate architecture, performance, compatibility, coupling, stability, production method, or testability tradeoffs. Use official docs, plugin/repository docs, examples, or mature community practice when external APIs, plugins, performance conventions, or uncertain architecture choices affect the answer. Do not use it for code review, post-change validation, task-card authoring, or implementation.
+description: Use this skill for read-only engineering consultation before implementation when the user asks how to build something more safely, compare implementation approaches, evaluate architecture, performance, compatibility, coupling, stability, production method, or testability tradeoffs. It invokes gamekit-research when external evidence is required, then combines that evidence with local repository facts. Do not use it for code review, post-change validation, task-card authoring, or implementation.
 ---
 
 # gamekit-ask
@@ -9,28 +9,29 @@ Purpose: answer engineering implementation questions before code is changed.
 
 Use this workflow when the user wants better thinking about implementation shape, architecture, performance, coupling, compatibility, stability, production method, or testability. Keep the answer compact and practical.
 
-Research Mode: when the user explicitly asks for online search, official guidance, community recommendations, best practices, reference material, latest/current practice, or says not to rely only on model memory, evidence lookup is required before answering.
-
 ## Workflow
 
 1. Restate the engineering question.
-2. Read structured context first: local session state, project brief, knowledge index, relevant system cards, then targeted files only as needed.
+2. Read structured context first: local session state, project brief, architecture index, relevant system cards, then targeted files only as needed.
 3. Identify the active engine profile from evidence or user intent.
-4. When external APIs, plugins, repositories, performance conventions, or uncertain architecture choices affect the answer, check evidence before relying on memory: official docs first, then plugin/repository docs and examples, then mature community practice.
-5. Compare the smallest useful set of realistic options, usually two or three.
-6. Evaluate tradeoffs across compatibility, coupling, stability/regression, performance, production cost, and testability.
-7. Recommend one approach and state when to use `gamekit-plan`, `gamekit-build`, `gamekit-check`, `gamekit-review`, or `gamekit-task` next.
-8. If the question is architecture-sensitive, use read-only `architecture-reviewer` only when the active tool supports agents and the user's request already authorizes that workflow; otherwise recommend it. Do not use implementation workers from `gamekit-ask` alone.
+4. Apply the Evidence Gate. Invoke `gamekit-research` and wait for its result when the user asks for official, current, community, literature, source-backed, or best-practice evidence; when version-sensitive external APIs, SDKs, plugins, packages, or engine behavior matter; or when an external fact could change an architecture, compatibility, dependency, or performance recommendation.
+5. Skip research when current repository evidence is sufficient, the knowledge is stable and version-independent, or the user explicitly requests local-only analysis.
+6. Compare the smallest useful set of realistic options, usually two or three.
+7. Evaluate tradeoffs across compatibility, coupling, stability/regression, performance, production cost, and testability.
+8. Recommend one approach and state when to use `gamekit-plan`, `gamekit-build`, `gamekit-check`, `gamekit-review`, or `gamekit-task` next.
+9. If the question is architecture-sensitive, use read-only `architecture-reviewer` only when the active tool supports agents and the user's request already authorizes that workflow; otherwise recommend it. Do not use implementation workers from `gamekit-ask` alone.
 
 ## Boundaries
 
 - Read-only by default. Do not edit code, assets, task cards, project memory, or shared docs.
+- `gamekit-research` is the only external evidence workflow. Do not simulate research inside `gamekit-ask`.
+- If research is unavailable, identify the limitation and keep any local-only recommendation provisional.
 - Evidence lookup is not permission to implement. If implementation is also requested, answer the consultation first, then route back to `gamekit-build`.
 - Do not perform diff review. Use `gamekit-review` for explicit review requests.
 - Do not perform post-change validation. Use `gamekit-check` for verification, QA, debug triage, or risk review after changes.
 - Do not turn the answer into a full design document unless the user asks for one.
 - Do not paste long quotes or broad research notes. Summarize only evidence that changes the recommendation.
-- When a recommendation becomes a user-confirmed design, trigger `project-memory-curator` after confirmation so it can record the approved design without marking it as code-verified. If the decision is long-lived, recommend an ADR proposal; do not write it without confirmation.
+- When a recommendation becomes user-confirmed design, trigger `project-memory-curator` after confirmation so it can record the approved design without marking it as code-verified.
 
 ## Output Format
 
@@ -38,7 +39,7 @@ Research Mode: when the user explicitly asks for online search, official guidanc
 
 ## Context
 
-Include one compact `Evidence checked:` line. Use `local repo only; no external API/plugin involved` when external lookup was not needed.
+Include one compact `Evidence checked:` line. Summarize the research result or use `local repo only` when external lookup was not needed.
 
 ## Options
 

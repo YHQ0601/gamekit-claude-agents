@@ -69,7 +69,8 @@ Do not ask the user to manually tag agents unless routing is ambiguous.
 Workflow routing:
 
 - Use `gamekit-plan` for ambiguous or multi-part requests before implementation. It should include a compact engineering preflight, add concise planning notes for reuse, cleanup, alternatives, and concrete risks when complexity warrants it, decide whether subagents are useful, and choose validation depth without defaulting every plan to `gamekit-check`.
-- Use `gamekit-ask` for read-only engineering consultation about implementation approach, architecture, compatibility, coupling, stability, performance, production method, or testability. Use its Research Mode when the user asks for official guidance, references, best practices, latest/current practice, or evidence-backed advice.
+- Use `gamekit-research` for isolated, read-only web research when current official, community, literature, or version-sensitive external evidence is required.
+- Use `gamekit-ask` for read-only engineering consultation and final recommendations. It should invoke `gamekit-research` when its Evidence Gate requires external evidence.
 - Use `gamekit-check` after behavior-affecting changes or for debug triage. It validates risks; explicit `/gamekit-check` may use Safe Auto-Fix Escalation for one `Direct Fix Candidate` via `gamekit-build`, then return to check validation.
 - Use `gamekit-review` only for explicit review requests. It is read-only and findings-first.
 - Mixed placeholder asset plus integration work must be sequenced: use `gamekit-assets` or `placeholder-asset-worker` for placeholder creation first, then `gamekit-build` for code/data/UnitDef/prefab/scene integration and validation.
@@ -79,12 +80,13 @@ Subagent flow:
 - The main agent remains the orchestrator. Simple work should stay local.
 - Use subagents automatically only when the active tool supports them and the user's request already authorizes that kind of work.
 - `gamekit-plan` may route to `architecture-reviewer`, `game-code-worker`, `placeholder-asset-worker`, `game-qa-checker`, or `task-card-manager`.
-- `gamekit-ask` usually uses no subagent; serious architecture tradeoffs may use or recommend read-only `architecture-reviewer`.
+- `gamekit-research` uses the read-only `web-researcher` subagent; `gamekit-ask` waits for its evidence before continuing. Serious architecture tradeoffs may also use or recommend read-only `architecture-reviewer`.
 - `gamekit-check` may use `game-qa-checker`; `gamekit-review` must use `code-reviewer` for explicit review when subagent delegation is available.
 
 Use:
 
 - `architecture-reviewer` before changes affecting architecture, gameplay system boundaries, data models, save data, economy, networking, performance, extensibility, or long-term maintainability.
+- `web-researcher` only through `gamekit-research` for current external evidence. It must search the web, cite sources, and remain read-only.
 - `game-code-worker` for focused implementation in the active engine or runtime.
 - `placeholder-asset-worker` when temporary assets, blockouts, icons, VFX placeholders, UI placeholders, or replacement plans are needed.
 - `game-qa-checker` after code, asset, scene, content, package, or behavior-affecting changes.
