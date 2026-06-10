@@ -47,7 +47,7 @@ Scope:
 
 Engine:
 
-Result: Pass / Risky / Fail
+Result: ✅ Pass / ⚠️ Risky / ❌ Fail
 
 Top Risks: list 1-3 terse risks or `None`
 

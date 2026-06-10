@@ -47,7 +47,7 @@ Return only:
 
 ## Task Card Decision
 
-Created / Updated / Split / Blocked / No change needed
+✅ Created / ✅ Updated / ✅ Split / ⛔ Blocked / ➖ No change needed
 
 ## Files Changed
 

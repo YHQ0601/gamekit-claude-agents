@@ -64,7 +64,7 @@ Purpose: manage parent/child task cards under `docs/tasks/` as executable work o
 
 Purpose:
 
-Decision: Created / Updated / Split / Blocked / No change needed
+Decision: ✅ Created / ✅ Updated / ✅ Split / ⛔ Blocked / ➖ No change needed
 
 Files Changed:
 

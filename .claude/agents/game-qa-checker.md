@@ -47,4 +47,6 @@ Return only:
 
 ## Debug Triage
 
-## Pass / Risky / Fail
+## Result
+
+✅ Pass / ⚠️ Risky / ❌ Fail

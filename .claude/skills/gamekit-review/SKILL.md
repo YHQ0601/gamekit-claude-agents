@@ -56,7 +56,7 @@ Scope:
 
 Engine:
 
-Verdict: Pass / Risky / Incorrect
+Verdict: ✅ Pass / ⚠️ Risky / ❌ Incorrect
 
 Top Risks: list 1-3 terse risks or `None`
 

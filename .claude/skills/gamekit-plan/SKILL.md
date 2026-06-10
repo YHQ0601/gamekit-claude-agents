@@ -57,6 +57,6 @@ Mention whether to use `architecture-reviewer`, `game-code-worker`, `placeholder
 
 ## Start Decision / Questions
 
-Yes / No / Need user decision
+Start Decision: ✅ Start / ⛔ Do not start / ❓ Need user decision
 
 Validation Depth: none / build-local / gamekit-check / gamekit-check + game-qa-checker
