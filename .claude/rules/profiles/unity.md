@@ -62,8 +62,12 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 
 ## C# Rules
 
-- **Inspector 中拖入预制体引用时，应从 Project 窗口拖入而非 Hierarchy/预制体内部实例。** 内部实例引用在 Instantiate 后会导致子节点状态异常（不可见/被关闭）。当字段需要引用 Project 预制体资产时，运行时应加 `gameObject.scene.IsValid()` 检测并输出 Warning 提示。
-- Prefer `[SerializeField] private` fields over public mutable fields for Inspector references.
+Inspector contract for project-owned code:
+
+- Prefer `[SerializeField] private` over public mutable Inspector fields, and give each field a concise `[Tooltip]`. Follow the project's established Inspector language; otherwise use the user's primary conversation language, and ask if still unclear. Do not infer it from the operating-system locale.
+- When a prefab reference requires a component on its root, serialize that component type instead of `GameObject` plus `GetComponent`. Use `GameObject` only for intentionally heterogeneous prefabs, with `OnValidate` or equivalent editor validation.
+- Assign prefab assets from the Project window, not scene or prefab-instance objects from the Hierarchy. Validate asset-versus-scene identity when that distinction matters.
+- Check required Inspector, configuration, or injected dependencies at the earliest practical validation point. On absence, emit one actionable `Debug.LogWarning(..., this)` naming the missing dependency and repair action; avoid silent failure and per-frame warning spam, then return, disable, or degrade safely as appropriate.
 - Be careful when renaming serialized fields; use a migration strategy such as `FormerlySerializedAs` when serialized data must survive the rename.
 - Prefer ScriptableObject or existing config patterns for skills, items, characters, levels, and balance data.
 - Do not store runtime combat state in ScriptableObjects unless the project already does so intentionally.
@@ -94,6 +98,7 @@ Keep third-party packages, samples, plugins, generated data, and Asset Store con
 - Discover the solution at the repository root. Prefer the `.sln` matching the repository directory name; if multiple remain, choose the clearest main project solution and report the choice.
 - Report a passing proxy check only as `C# compile-layer proxy check passed`, never as Unity validation. If it fails, distinguish stale Unity-generated project files or local .NET environment issues from errors in changed source.
 - Run or recommend the smallest relevant Unity compile, EditMode, PlayMode, or manual Editor check.
+- When serialized fields or Inspector wiring change, verify Tooltip coverage, prefab field types, missing-dependency warnings, and prefab/scene bindings.
 - When checking scene configuration, include prefab instances, referenced prefab assets, overrides, Missing Script, Missing Reference, and stale GUID risks; use `gamekit-unity-yaml-context` for referenced `.prefab` summaries when the scene summary is insufficient.
 - Inspect NullReference, Missing Script, Missing Reference, prefab/scene/ScriptableObject reference, serialized field migration, Addressables, package, input, and render pipeline risks when affected.
 - Use the Profiler or allocation inspection only when the change touches hot paths, loading, rendering, physics, animation, UI rebuilds, or repeated per-frame work.
