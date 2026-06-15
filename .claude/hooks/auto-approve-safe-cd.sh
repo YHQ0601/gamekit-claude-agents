@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-# PermissionRequest hook wrapper.
+# Project-boundary PermissionRequest hook wrapper.
 # Exit 0 approves the request; exit 1 falls through to Claude Code.
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"

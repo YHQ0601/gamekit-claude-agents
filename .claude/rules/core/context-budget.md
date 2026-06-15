@@ -10,7 +10,7 @@ The main conversation should keep conclusions, not raw exploration.
 
 ## Rules
 
-- Prefer structured context before broad scanning: local session state, project brief, knowledge index, system cards, then targeted files.
+- Prefer structured context before broad scanning: local session state, project brief, architecture index, system cards, then targeted files.
 - Prefer reading index files, templates, and relevant examples before expanding to broad search.
 - Do not scan entire folders unless necessary.
 - Do not read more than a small set of large files before summarizing.

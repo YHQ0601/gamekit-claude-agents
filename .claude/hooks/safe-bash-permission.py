@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Approve project-local read-only Bash permission requests.
+"""Auto-approve Bash requests that respect the current project boundary.
 
-Exit 0 means "auto-approve". Exit 1 means "fall through to Claude Code".
-The policy is intentionally conservative: unknown syntax or commands are not
-denied, they are simply not auto-approved.
+Exit 0 approves the request. Exit 1 falls through to Claude Code's normal
+permission prompt. The hook never denies a command.
 """
 
 from __future__ import annotations
@@ -14,13 +13,14 @@ import re
 import shlex
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 
 PROJECT_MARKERS = (
+    ".git",
     ".claude",
     "AGENTS.md",
-    ".git",
     "ProjectSettings/ProjectVersion.txt",
     "Packages/manifest.json",
     "package.json",
@@ -29,7 +29,11 @@ PROJECT_MARKERS = (
 READ_COMMANDS = {
     "rg",
     "grep",
+    "findstr",
+    "select-string",
     "cat",
+    "type",
+    "get-content",
     "head",
     "tail",
     "sed",
@@ -38,24 +42,87 @@ READ_COMMANDS = {
     "wc",
     "sort",
     "uniq",
-    "find",
+    "cut",
+    "tr",
+    "comm",
+    "cmp",
+    "column",
+    "jq",
+    "yq",
+    "file",
+    "strings",
+    "basename",
+    "dirname",
+    "realpath",
+    "readlink",
+    "md5sum",
+    "sha1sum",
+    "sha256sum",
+    "sha512sum",
     "ls",
-    "pwd",
-    "echo",
-    "findstr",
-    "type",
     "dir",
-    "get-content",
     "get-childitem",
-    "select-string",
-    "read",
-    "xxd",
+    "resolve-path",
+    "test-path",
+    "select-object",
+    "measure-object",
+    "sort-object",
+    "group-object",
+    "compare-object",
+    "format-table",
+    "format-list",
+    "convertfrom-json",
+    "convertto-json",
     "tree",
     "du",
     "stat",
-    "printf",
+    "xxd",
+    "pwd",
+    "where",
+    "which",
     "test",
     "[",
+    "printf",
+    "echo",
+}
+
+MUTATING_COMMANDS = {
+    "rm",
+    "rmdir",
+    "del",
+    "erase",
+    "unlink",
+    "shred",
+    "remove-item",
+    "mv",
+    "move",
+    "move-item",
+    "rename",
+    "rename-item",
+    "cp",
+    "copy",
+    "copy-item",
+    "touch",
+    "mkdir",
+    "md",
+    "new-item",
+    "set-content",
+    "add-content",
+    "out-file",
+    "tee",
+    "install",
+    "chmod",
+    "chown",
+    "icacls",
+    "takeown",
+    "npm",
+    "npx",
+    "pnpm",
+    "yarn",
+    "dotnet",
+    "msbuild",
+    "unity",
+    "unity.exe",
 }
 
 GIT_READ_SUBCOMMANDS = {
@@ -68,34 +135,42 @@ GIT_READ_SUBCOMMANDS = {
     "check-ignore",
     "cat-file",
     "merge-tree",
+    "rev-parse",
+    "branch",
+    "remote",
+    "tag",
 }
 
-FIND_EXEC_READ_COMMANDS = {"grep", "cat", "head", "tail", "wc", "sed", "awk", "printf"}
-
-DANGEROUS_COMMANDS = {
-    "rm",
-    "rmdir",
-    "del",
-    "remove-item",
-    "mv",
-    "move",
-    "cp",
-    "copy",
-    "touch",
-    "mkdir",
-    "new-item",
-    "set-content",
-    "add-content",
-    "out-file",
-    "chmod",
-    "chown",
-    "npm",
-    "curl",
-    "unity.exe",
+SCRIPT_COMMANDS = {
+    "python",
+    "python3",
+    "py",
+    "node",
+    "bash",
+    "sh",
+    "pwsh",
+    "powershell",
+    "cmd",
 }
 
-SCRIPT_COMMANDS = {"python", "python3", "node", "bash", "sh", "pwsh", "powershell"}
-WRAPPERS = {"time", "timeout", "nice", "nohup", "stdbuf", "command"}
+WRAPPERS = {"time", "timeout", "nice", "nohup", "stdbuf", "command", "env"}
+SHELL_KEYWORDS = {
+    "do",
+    "done",
+    "then",
+    "else",
+    "elif",
+    "fi",
+    "while",
+    "until",
+    "if",
+}
+
+
+@dataclass(frozen=True)
+class Redirection:
+    target: str
+    writes: bool
 
 
 def main() -> int:
@@ -108,13 +183,13 @@ def main() -> int:
     if not command:
         return 1
 
-    cwd = extract_cwd(payload)
-    project_root = find_project_root(cwd)
+    start_cwd = extract_cwd(payload)
+    project_root = find_project_root(start_cwd) or find_project_root(Path.cwd())
     if project_root is None:
         return 1
 
-    policy = Policy(project_root=project_root, start_cwd=cwd)
-    return 0 if policy.is_safe(command) else 1
+    policy = ProjectBoundaryPolicy(project_root, start_cwd)
+    return 0 if policy.approves(command) else 1
 
 
 def extract_command(payload: object) -> str:
@@ -130,195 +205,275 @@ def extract_command(payload: object) -> str:
 def extract_cwd(payload: object) -> Path:
     if isinstance(payload, dict):
         tool_input = payload.get("tool_input")
-        candidates = []
+        candidates: list[object] = []
         if isinstance(tool_input, dict):
-            candidates.extend([tool_input.get("cwd"), tool_input.get("workdir")])
-        candidates.extend([payload.get("cwd"), payload.get("workdir")])
+            candidates.extend((tool_input.get("cwd"), tool_input.get("workdir")))
+        candidates.extend((payload.get("cwd"), payload.get("workdir")))
         for candidate in candidates:
             if isinstance(candidate, str) and candidate.strip():
-                return normalize_raw_path(candidate, Path.cwd()) or Path.cwd()
-    return Path.cwd()
+                path = normalize_path(candidate, Path.cwd())
+                if path is not None:
+                    return path
+    return Path.cwd().resolve()
 
 
-def find_project_root(cwd: Path) -> Path | None:
-    cwd = cwd.resolve()
+def find_project_root(start: Path) -> Path | None:
+    start = start.resolve()
     try:
         result = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
-            cwd=str(cwd),
+            cwd=str(start),
             capture_output=True,
             text=True,
             timeout=3,
         )
         if result.returncode == 0 and result.stdout.strip():
-            root = normalize_raw_path(result.stdout.strip(), cwd)
+            root = normalize_path(result.stdout.strip(), start)
             if root is not None:
                 return root.resolve()
-    except Exception:
+    except (OSError, subprocess.SubprocessError):
         pass
 
-    for current in (cwd, *cwd.parents):
-        for marker in PROJECT_MARKERS:
-            if (current / marker).exists():
-                return current.resolve()
+    for current in (start, *start.parents):
+        if any((current / marker).exists() for marker in PROJECT_MARKERS):
+            return current.resolve()
     return None
 
 
-class Policy:
+class ProjectBoundaryPolicy:
     def __init__(self, project_root: Path, start_cwd: Path) -> None:
         self.project_root = project_root.resolve()
         self.cwd = start_cwd.resolve()
-        if not self.is_under_project(self.cwd):
-            self.cwd = self.project_root
 
-    def is_safe(self, command: str) -> bool:
-        if has_unsupported_shell_syntax(command):
-            return False
-        if has_unsafe_redirection(command):
-            return False
-
+    def approves(self, command: str) -> bool:
+        if has_unsupported_dynamic_syntax(command):
+            return self.is_in_project(self.cwd) and not self.raw_command_has_outside_mutation(command)
         try:
             segments = split_compound(command)
         except ValueError:
-            return False
+            return self.is_in_project(self.cwd) and not self.raw_command_has_outside_mutation(command)
         if not segments:
             return False
 
         for segment in segments:
-            if not self.is_safe_segment(segment):
+            if not self.approves_segment(segment):
                 return False
         return True
 
-    def is_safe_segment(self, segment: str) -> bool:
+    def approves_segment(self, segment: str) -> bool:
+        grouped = unwrap_shell_group(segment)
+        if grouped is not None:
+            nested = ProjectBoundaryPolicy(self.project_root, self.cwd)
+            return nested.approves(grouped)
+
+        substitutions, outer = extract_substitutions(segment)
+        for inner in substitutions:
+            nested = ProjectBoundaryPolicy(self.project_root, self.cwd)
+            if not nested.approves(inner):
+                return False
+
         try:
-            tokens = tokenize(segment)
+            command_text, redirections = strip_redirections(outer)
+            tokens = tokenize(command_text)
         except ValueError:
             return False
-        tokens = strip_leading_env_assignments(tokens)
-        tokens = strip_wrappers(tokens)
-        if not tokens:
+
+        if not self.redirections_are_safe(redirections):
             return False
 
-        command = tokens[0].lower()
+        tokens = strip_prefixes(tokens)
+        if not tokens:
+            return not any(redirection.writes for redirection in redirections)
 
+        command = command_name(tokens[0])
         if command == "cd":
             return self.apply_cd(tokens)
-        if command == "git":
-            return self.is_safe_git(tokens)
-        if command == "find":
-            return self.is_safe_find(tokens)
         if command in SCRIPT_COMMANDS:
-            return self.is_safe_trusted_skill_script(tokens)
-        if command in DANGEROUS_COMMANDS:
-            return False
+            return self.approves_script(tokens)
+        if command == "git":
+            return self.approves_git(tokens)
+        if command == "find":
+            return self.approves_find(tokens)
+        if command == "xargs":
+            return self.approves_xargs(tokens)
+        if command == "curl":
+            return self.approves_curl(tokens)
         if command in READ_COMMANDS:
-            return self.paths_are_project_local(tokens)
-        return False
+            if command == "sed" and any(flag == "-i" or flag.startswith("-i") for flag in tokens[1:]):
+                return self.mutation_stays_in_project(tokens[1:])
+            return True
+        if command in MUTATING_COMMANDS:
+            return self.mutation_stays_in_project(tokens[1:])
+
+        # Unknown tools are trusted only when launched from inside the project
+        # and do not name an explicit outside path.
+        return self.is_in_project(self.cwd) and not self.has_explicit_outside_path(tokens[1:])
 
     def apply_cd(self, tokens: list[str]) -> bool:
-        if len(tokens) != 2:
+        if len(tokens) != 2 or tokens[1] in {"-", "~"}:
             return False
-        target = tokens[1]
-        if target in {"-", "~"}:
+        target = normalize_path(tokens[1], self.cwd)
+        if target is None:
             return False
-        resolved = normalize_raw_path(target, self.cwd)
-        if resolved is None or not self.is_under_project(resolved):
-            return False
-        self.cwd = resolved.resolve()
+        self.cwd = target.resolve()
         return True
 
-    def is_safe_git(self, tokens: list[str]) -> bool:
-        if len(tokens) < 2:
+    def approves_script(self, tokens: list[str]) -> bool:
+        command = command_name(tokens[0])
+        inline = inline_script_command(command, tokens)
+        if inline is not None:
+            if command in {"powershell", "pwsh", "cmd", "bash", "sh"}:
+                nested = ProjectBoundaryPolicy(self.project_root, self.cwd)
+                return nested.approves(inline)
+            if self.is_in_project(self.cwd):
+                return not self.raw_command_has_outside_mutation(inline)
             return False
-        return tokens[1] in GIT_READ_SUBCOMMANDS
 
-    def is_safe_find(self, tokens: list[str]) -> bool:
-        if "-delete" in tokens or "-execdir" in tokens:
-            return False
+        if is_version_query(tokens[1:]):
+            return True
 
-        roots = []
-        i = 1
-        while i < len(tokens):
-            token = tokens[i]
-            if token == "--":
-                i += 1
-                continue
-            if token.startswith("-") or token in {"(", ")", "!", "not"}:
-                break
-            roots.append(token)
-            i += 1
+        # Complete-auto mode trusts scripts launched from the project. Script
+        # internals cannot be reliably inspected by a PermissionRequest hook.
+        if self.is_in_project(self.cwd):
+            return not self.has_explicit_outside_path(tokens[1:])
+        return False
 
-        if not roots:
-            roots = ["."]
-        for root in roots:
-            if not self.path_token_is_project_local(root):
-                return False
-
-        i = 1
-        while i < len(tokens):
-            token = tokens[i]
-            if token in {"-exec", "-ok"}:
-                exec_tokens = []
-                i += 1
-                while i < len(tokens) and tokens[i] not in {";", "+"}:
-                    exec_tokens.append(tokens[i])
-                    i += 1
-                if not self.is_safe_find_exec(exec_tokens):
+    def approves_git(self, tokens: list[str]) -> bool:
+        git_cwd = self.cwd
+        subcommand_index = 1
+        index = 1
+        while index < len(tokens):
+            token = tokens[index]
+            if token == "-C" and index + 1 < len(tokens):
+                target = normalize_path(tokens[index + 1], git_cwd)
+                if target is None:
                     return False
-            i += 1
-        return self.paths_are_project_local(tokens, find_mode=True)
-
-    def is_safe_find_exec(self, tokens: list[str]) -> bool:
-        if not tokens:
-            return False
-        command = tokens[0].lower()
-        if command not in FIND_EXEC_READ_COMMANDS:
-            return False
-        if any(token.lower() in DANGEROUS_COMMANDS or token.lower() in SCRIPT_COMMANDS for token in tokens):
-            return False
-        return self.paths_are_project_local(tokens, find_exec_mode=True)
-
-    def is_safe_trusted_skill_script(self, tokens: list[str]) -> bool:
-        if len(tokens) < 2:
-            return False
-        script = normalize_raw_path(tokens[1], self.cwd)
-        if script is None or not self.is_under_project(script):
-            return False
-        try:
-            rel = script.resolve().relative_to(self.project_root)
-        except ValueError:
-            return False
-        return len(rel.parts) >= 3 and rel.parts[0] == ".claude" and rel.parts[1] == "skills"
-
-    def paths_are_project_local(
-        self,
-        tokens: list[str],
-        *,
-        find_mode: bool = False,
-        find_exec_mode: bool = False,
-    ) -> bool:
-        for index, token in enumerate(tokens):
-            if should_skip_token(tokens, index, find_mode=find_mode, find_exec_mode=find_exec_mode):
+                git_cwd = target
+                index += 2
                 continue
-            if token == "/dev/null":
-                continue
-            if looks_like_absolute_path(token):
-                path = normalize_raw_path(path_prefix_before_glob(token), self.cwd)
-                if path is None or not self.is_under_project(path):
+            if token.startswith("-C") and len(token) > 2:
+                target = normalize_path(token[2:], git_cwd)
+                if target is None:
                     return False
+                git_cwd = target
+                index += 1
                 continue
-            if looks_like_path_token(token) and not self.path_token_is_project_local(token):
+            if token.startswith("-"):
+                index += 1
+                continue
+            subcommand_index = index
+            break
+        else:
+            return True
+
+        subcommand = tokens[subcommand_index].lower()
+        if subcommand in GIT_READ_SUBCOMMANDS:
+            return True
+        return self.is_in_project(git_cwd) and not self.has_explicit_outside_path(
+            tokens[subcommand_index + 1:],
+            base=git_cwd,
+        )
+
+    def approves_find(self, tokens: list[str]) -> bool:
+        mutation = "-delete" in tokens
+        roots = find_roots(tokens)
+
+        index = 1
+        while index < len(tokens):
+            if tokens[index] in {"-exec", "-execdir", "-ok", "-okdir"}:
+                nested_tokens: list[str] = []
+                index += 1
+                while index < len(tokens) and tokens[index] not in {";", "+"}:
+                    nested_tokens.append(tokens[index])
+                    index += 1
+                if not nested_tokens:
+                    return False
+                nested_command = command_name(nested_tokens[0])
+                if nested_command in SCRIPT_COMMANDS:
+                    nested_policy = ProjectBoundaryPolicy(self.project_root, self.cwd)
+                    if not nested_policy.approves_segment(" ".join(nested_tokens)):
+                        return False
+                if nested_command not in READ_COMMANDS:
+                    mutation = True
+                    if not self.mutation_stays_in_project(nested_tokens[1:]):
+                        return False
+            index += 1
+
+        if not mutation:
+            return True
+        return all(self.path_is_in_project(root) for root in roots)
+
+    def approves_xargs(self, tokens: list[str]) -> bool:
+        nested = [token for token in tokens[1:] if not token.startswith("-")]
+        if not nested:
+            return False
+        nested_command = command_name(nested[0])
+        if nested_command in READ_COMMANDS:
+            return True
+        if nested_command in SCRIPT_COMMANDS:
+            nested_policy = ProjectBoundaryPolicy(self.project_root, self.cwd)
+            return nested_policy.approves_segment(" ".join(nested))
+        return self.is_in_project(self.cwd) and not self.has_explicit_outside_path(nested[1:])
+
+    def approves_curl(self, tokens: list[str]) -> bool:
+        output_flags = {"-o", "--output", "-O", "--remote-name", "--output-dir"}
+        writes = any(
+            token in output_flags
+            or token.startswith("--output=")
+            or token.startswith("--output-dir=")
+            for token in tokens[1:]
+        )
+        if not writes:
+            return True
+        return self.mutation_stays_in_project(tokens[1:])
+
+    def redirections_are_safe(self, redirections: list[Redirection]) -> bool:
+        for redirection in redirections:
+            if not redirection.writes or redirection.target in {"/dev/null", "NUL", "nul"}:
+                continue
+            if not self.path_is_in_project(redirection.target):
                 return False
         return True
 
-    def path_token_is_project_local(self, token: str) -> bool:
-        path = normalize_raw_path(path_prefix_before_glob(token), self.cwd)
-        return path is not None and self.is_under_project(path)
+    def mutation_stays_in_project(self, args: list[str]) -> bool:
+        if not self.is_in_project(self.cwd):
+            return False
+        return not self.has_explicit_outside_path(args)
 
-    def is_under_project(self, path: Path) -> bool:
+    def raw_command_has_outside_mutation(self, command: str) -> bool:
+        if not contains_mutation_signal(command):
+            return False
+        return self.has_explicit_outside_path(extract_path_candidates(command))
+
+    def has_explicit_outside_path(self, args: list[str], *, base: Path | None = None) -> bool:
+        base = base or self.cwd
+        for raw in args:
+            for candidate in option_path_candidates(raw):
+                if candidate in {"/dev/null", "NUL", "nul", "{}", ";", "+"}:
+                    continue
+                if contains_unresolved_path_expansion(candidate):
+                    if self.is_in_project(base):
+                        continue
+                    return True
+                if not looks_like_explicit_path(candidate):
+                    continue
+                path = normalize_path(path_prefix_before_glob(candidate), base)
+                if path is not None and not self.is_in_project(path):
+                    return True
+        return False
+
+    def path_is_in_project(self, raw: str) -> bool:
+        if contains_unresolved_path_expansion(raw):
+            return False
+        path = normalize_path(path_prefix_before_glob(raw), self.cwd)
+        return path is not None and self.is_in_project(path)
+
+    def is_in_project(self, path: Path) -> bool:
         try:
-            common = os.path.commonpath([os.path.normcase(str(self.project_root)), os.path.normcase(str(path.resolve()))])
-        except ValueError:
+            common = os.path.commonpath(
+                (os.path.normcase(str(self.project_root)), os.path.normcase(str(path.resolve())))
+            )
+        except (OSError, ValueError):
             return False
         return common == os.path.normcase(str(self.project_root))
 
@@ -328,93 +483,330 @@ def split_compound(command: str) -> list[str]:
     current: list[str] = []
     quote: str | None = None
     escaped = False
-    i = 0
+    substitution_depth = 0
+    group_depth = 0
+    index = 0
 
-    while i < len(command):
-        char = command[i]
+    while index < len(command):
+        char = command[index]
         if escaped:
-            current.append("\\" + char)
+            current.extend(("\\", char))
             escaped = False
-            i += 1
+            index += 1
             continue
         if char == "\\":
             escaped = True
-            i += 1
+            index += 1
             continue
         if quote:
             current.append(char)
             if char == quote:
                 quote = None
-            i += 1
+            index += 1
             continue
         if char in {"'", '"'}:
             quote = char
             current.append(char)
-            i += 1
+            index += 1
             continue
-        if command.startswith("&&", i) or command.startswith("||", i):
+        if command.startswith("$(", index):
+            substitution_depth += 1
+            current.append("$(")
+            index += 2
+            continue
+        if char == ")" and substitution_depth:
+            substitution_depth -= 1
+            current.append(char)
+            index += 1
+            continue
+        if substitution_depth:
+            current.append(char)
+            index += 1
+            continue
+        if char == "(":
+            group_depth += 1
+            current.append(char)
+            index += 1
+            continue
+        if char == ")" and group_depth:
+            group_depth -= 1
+            current.append(char)
+            index += 1
+            continue
+        if group_depth:
+            current.append(char)
+            index += 1
+            continue
+        if command.startswith(("&&", "||"), index):
             add_segment(segments, current)
             current = []
-            i += 2
+            index += 2
             continue
         if char in {";", "|"}:
             add_segment(segments, current)
             current = []
-            i += 1
+            index += 1
             continue
         current.append(char)
-        i += 1
+        index += 1
 
-    if escaped or quote:
-        raise ValueError("unterminated escape or quote")
+    if quote or escaped or substitution_depth or group_depth:
+        raise ValueError("unterminated shell expression")
     add_segment(segments, current)
     return segments
 
 
-def add_segment(segments: list[str], current: list[str]) -> None:
-    segment = "".join(current).strip()
+def add_segment(segments: list[str], chars: list[str]) -> None:
+    segment = "".join(chars).strip()
     if segment:
         segments.append(segment)
 
 
-def tokenize(segment: str) -> list[str]:
-    lexer = shlex.shlex(segment, posix=False)
+def extract_substitutions(command: str) -> tuple[list[str], str]:
+    substitutions: list[str] = []
+    output: list[str] = []
+    index = 0
+
+    while index < len(command):
+        if not command.startswith("$(", index):
+            output.append(command[index])
+            index += 1
+            continue
+        depth = 1
+        cursor = index + 2
+        quote: str | None = None
+        while cursor < len(command) and depth:
+            char = command[cursor]
+            if quote:
+                if char == quote:
+                    quote = None
+            elif char in {"'", '"'}:
+                quote = char
+            elif command.startswith("$(", cursor):
+                depth += 1
+                cursor += 1
+            elif char == ")":
+                depth -= 1
+            cursor += 1
+        if depth:
+            raise ValueError("unterminated command substitution")
+        substitutions.append(command[index + 2:cursor - 1])
+        output.append("_SUBSTITUTION_")
+        index = cursor
+    return substitutions, "".join(output)
+
+
+def strip_redirections(segment: str) -> tuple[str, list[Redirection]]:
+    lexer = shlex.shlex(segment, posix=False, punctuation_chars="<>")
     lexer.whitespace_split = True
     lexer.commenters = ""
-    tokens = [strip_shell_quotes(token) for token in lexer]
-    return [";" if token == r"\;" else token for token in tokens]
+    raw_tokens = list(lexer)
+    output: list[str] = []
+    redirections: list[Redirection] = []
+    index = 0
+
+    while index < len(raw_tokens):
+        token = raw_tokens[index]
+        operator = token
+        if re.fullmatch(r"\d+", token) and index + 1 < len(raw_tokens):
+            if raw_tokens[index + 1] in {">", ">>", "<"}:
+                operator = raw_tokens[index + 1]
+                index += 1
+            else:
+                output.append(token)
+                index += 1
+                continue
+        if operator not in {">", ">>", "<"}:
+            output.append(token)
+            index += 1
+            continue
+        if index + 1 >= len(raw_tokens):
+            raise ValueError("redirection without target")
+        target = strip_quotes(raw_tokens[index + 1])
+        if target.startswith("&") or target in {"1", "2"}:
+            index += 2
+            continue
+        redirections.append(Redirection(target=target, writes=operator != "<"))
+        index += 2
+
+    return " ".join(output), redirections
 
 
-def strip_shell_quotes(token: str) -> str:
-    if len(token) >= 2 and token[0] == token[-1] and token[0] in {"'", '"'}:
-        return token[1:-1]
+def tokenize(command: str) -> list[str]:
+    lexer = shlex.shlex(command, posix=False)
+    lexer.whitespace_split = True
+    lexer.commenters = ""
+    return [";" if token == r"\;" else strip_quotes(token) for token in lexer]
+
+
+def strip_prefixes(tokens: list[str]) -> list[str]:
+    result = list(tokens)
+    while result and result[0].lower() in SHELL_KEYWORDS:
+        result.pop(0)
+    while result and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", result[0]):
+        result.pop(0)
+    while result and command_name(result[0]) in WRAPPERS:
+        wrapper = command_name(result.pop(0))
+        if wrapper == "timeout" and result and re.fullmatch(r"[0-9.]+[smhd]?", result[0]):
+            result.pop(0)
+        while result and result[0].startswith("-"):
+            result.pop(0)
+    return result
+
+
+def command_name(raw: str) -> str:
+    return Path(raw.replace("\\", "/")).name.lower()
+
+
+def unwrap_shell_group(segment: str) -> str | None:
+    value = segment.strip()
+    if len(value) < 2 or value[0] != "(" or value[-1] != ")":
+        return None
+    depth = 0
+    quote: str | None = None
+    escaped = False
+    for index, char in enumerate(value):
+        if escaped:
+            escaped = False
+            continue
+        if char == "\\":
+            escaped = True
+            continue
+        if quote:
+            if char == quote:
+                quote = None
+            continue
+        if char in {"'", '"'}:
+            quote = char
+            continue
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+            if depth == 0 and index != len(value) - 1:
+                return None
+    return value[1:-1].strip() if depth == 0 else None
+
+
+def find_roots(tokens: list[str]) -> list[str]:
+    roots: list[str] = []
+    for token in tokens[1:]:
+        if token == "--":
+            continue
+        if token.startswith("-") or token in {"(", ")", "!", "not"}:
+            break
+        roots.append(token)
+    return roots or ["."]
+
+
+def inline_script_command(command: str, tokens: list[str]) -> str | None:
+    flags_by_command = {
+        "powershell": {"-command", "-c"},
+        "pwsh": {"-command", "-c"},
+        "cmd": {"/c", "/k"},
+        "bash": {"-c"},
+        "sh": {"-c"},
+        "python": {"-c"},
+        "python3": {"-c"},
+        "py": {"-c"},
+        "node": {"-e", "--eval"},
+    }
+    flags = flags_by_command.get(command, set())
+    for index, token in enumerate(tokens[1:], 1):
+        lowered = token.lower()
+        if lowered in flags and index + 1 < len(tokens):
+            return tokens[index + 1]
+        for flag in flags:
+            if lowered.startswith(flag + ":") or lowered.startswith(flag + "="):
+                return token[len(flag) + 1:]
+    return None
+
+
+def is_version_query(args: list[str]) -> bool:
+    return bool(args) and all(
+        token.lower() in {"--version", "-v", "-version", "/version"}
+        for token in args
+    )
+
+
+def contains_mutation_signal(command: str) -> bool:
+    lowered = command.lower()
+    command_signals = MUTATING_COMMANDS | {
+        "writealltext",
+        "writeallbytes",
+        "write_text",
+        "write_bytes",
+        "write",
+        "delete",
+        "unlink",
+        "rmtree",
+        "remove",
+        "replace",
+        "rename",
+    }
+    if any(
+        re.search(rf"(?<![a-z0-9_-]){re.escape(signal)}(?![a-z0-9_-])", lowered)
+        for signal in command_signals
+    ):
+        return True
+    return bool(re.search(r"(?:^|[^<])>{1,2}(?![>&])", command))
+
+
+def extract_path_candidates(command: str) -> list[str]:
+    candidates = re.findall(
+        r"""(?ix)
+        (?:
+            [a-z]:[\\/][^\s"'`;|)]+
+            | /(?:mnt/[a-z]/)?[^\s"'`;|)]+
+            | \\\\[^\s"'`;|)]+
+            | \$\{?[a-z_][a-z0-9_]*\}?[\\/][^\s"'`;|)]+
+            | %[a-z_][a-z0-9_]*%[\\/][^\s"'`;|)]+
+        )
+        """,
+        command,
+    )
+    return [candidate.rstrip(".,") for candidate in candidates]
+
+
+def option_path_candidates(token: str) -> list[str]:
+    token = strip_quotes(token)
+    if token.startswith(("http://", "https://")):
+        return []
+    if "=" in token and token.startswith("-"):
+        return [token.split("=", 1)[1]]
+    return [token]
+
+
+def looks_like_explicit_path(token: str) -> bool:
+    if not token or token.startswith(("http://", "https://")):
+        return False
+    if token in {".", "..", "~"}:
+        return True
+    if re.match(r"^[A-Za-z]:[\\/]", token):
+        return True
+    if token.startswith(("/", "\\")):
+        return True
+    return "/" in token or "\\" in token
+
+
+def contains_unresolved_path_expansion(token: str) -> bool:
+    return token.startswith("~") or bool(re.search(r"\$[{A-Za-z_]|\%[^%]+\%", token))
+
+
+def path_prefix_before_glob(token: str) -> str:
+    for marker in ("*", "?", "["):
+        if marker in token:
+            prefix = token.split(marker, 1)[0]
+            parent = str(Path(prefix).parent)
+            return "." if parent in {"", "."} else parent
     return token
 
 
-def strip_leading_env_assignments(tokens: list[str]) -> list[str]:
-    index = 0
-    while index < len(tokens) and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", tokens[index]):
-        index += 1
-    return tokens[index:]
-
-
-def strip_wrappers(tokens: list[str]) -> list[str]:
-    while tokens and tokens[0] in WRAPPERS:
-        wrapper = tokens.pop(0)
-        if wrapper == "timeout" and tokens and re.match(r"^[0-9.]+[smhd]?$", tokens[0]):
-            tokens.pop(0)
-        while tokens and tokens[0].startswith("-"):
-            tokens.pop(0)
-    return tokens
-
-
-def normalize_raw_path(raw: str, cwd: Path) -> Path | None:
-    raw = raw.strip().strip("'\"")
-    if not raw or raw == "/dev/null":
+def normalize_path(raw: str, cwd: Path) -> Path | None:
+    value = strip_quotes(raw).strip()
+    if not value:
         return None
-    converted = convert_msys_path(raw)
-    if converted is None:
-        return None
+    converted = convert_shell_path(value)
     path = Path(converted)
     if not path.is_absolute():
         path = cwd / path
@@ -424,7 +816,7 @@ def normalize_raw_path(raw: str, cwd: Path) -> Path | None:
         return path.absolute()
 
 
-def convert_msys_path(raw: str) -> str | None:
+def convert_shell_path(raw: str) -> str:
     value = raw.replace("\\", "/")
     if re.match(r"^[A-Za-z]:/", value):
         return value
@@ -434,138 +826,17 @@ def convert_msys_path(raw: str) -> str | None:
     match = re.match(r"^/mnt/([A-Za-z])/(.*)$", value)
     if match:
         return f"{match.group(1).upper()}:/{match.group(2)}"
-    if value.startswith("/"):
-        return value
     return value
 
 
-def has_unsupported_shell_syntax(command: str) -> bool:
-    unsupported = ("$(", "`", "<(", ">(", "<<")
-    return any(pattern in command for pattern in unsupported)
-
-
-def has_unsafe_redirection(command: str) -> bool:
-    quote: str | None = None
-    escaped = False
-    i = 0
-    while i < len(command):
-        char = command[i]
-        if escaped:
-            escaped = False
-            i += 1
-            continue
-        if char == "\\":
-            escaped = True
-            i += 1
-            continue
-        if quote:
-            if char == quote:
-                quote = None
-            i += 1
-            continue
-        if char in {"'", '"'}:
-            quote = char
-            i += 1
-            continue
-        if char == "<":
-            return True
-        if char == ">":
-            j = i + 1
-            if j < len(command) and command[j] == ">":
-                j += 1
-            while j < len(command) and command[j].isspace():
-                j += 1
-            if j < len(command) and command[j] == "&":
-                i = j + 1
-                continue
-            target = []
-            while j < len(command) and not command[j].isspace() and command[j] not in {";", "|", "&"}:
-                target.append(command[j])
-                j += 1
-            if "".join(target) != "/dev/null":
-                return True
-            i = j
-            continue
-        i += 1
-    return quote is not None
-
-
-def looks_like_absolute_path(token: str) -> bool:
-    stripped = token.strip("'\"")
-    if stripped == "/dev/null":
-        return False
-    converted = convert_msys_path(stripped)
-    if converted is None:
-        return False
-    path = Path(converted)
-    return path.is_absolute()
-
-
-def looks_like_path_token(token: str) -> bool:
-    if not token or token in {"{}", ";", "+", "-", "--"}:
-        return False
-    if token.startswith("-"):
-        return False
-    if token.startswith(("http://", "https://")):
-        return False
-    if token in {"(", ")", "!", "not"}:
-        return False
-    if any(ch in token for ch in ("/", "\\")):
-        return True
-    if token in {".", ".."}:
-        return True
-    if any(ch in token for ch in ("*", "?", "[")):
-        return "/" in token or "\\" in token
-    return False
-
-
-def path_prefix_before_glob(token: str) -> str:
-    for glob_char in ("*", "?", "["):
-        if glob_char in token:
-            before = token.split(glob_char, 1)[0]
-            parent = str(Path(before).parent)
-            return "." if parent in {"", "."} else parent
+def strip_quotes(token: str) -> str:
+    if len(token) >= 2 and token[0] == token[-1] and token[0] in {"'", '"'}:
+        return token[1:-1]
     return token
 
 
-def should_skip_token(
-    tokens: list[str],
-    index: int,
-    *,
-    find_mode: bool,
-    find_exec_mode: bool,
-) -> bool:
-    token = tokens[index]
-    if index == 0:
-        return True
-    if token in {"{}", ";", "+", "(", ")", "!", "not"}:
-        return True
-    if token.startswith("-"):
-        return True
-    previous = tokens[index - 1] if index > 0 else ""
-    if previous in {
-        "-name",
-        "-iname",
-        "-regex",
-        "-iregex",
-        "-path",
-        "-ipath",
-        "-printf",
-        "-exec",
-        "-ok",
-        "-maxdepth",
-        "-mindepth",
-        "-type",
-        "-mtime",
-        "-mmin",
-        "-size",
-    }:
-        return True
-    if find_exec_mode and token == "{}":
-        return True
-    if token.startswith(("http://", "https://")):
-        return True
-    return False
+def has_unsupported_dynamic_syntax(command: str) -> bool:
+    return any(marker in command for marker in ("`", "<(", ">(", "<<", "<<<"))
 
 
 if __name__ == "__main__":

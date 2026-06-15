@@ -78,6 +78,21 @@ DEFAULT_ROOT_MARKERS = (
     Path("Assets"),
 )
 
+SKIP_GUID_SCAN_DIRS = {
+    ".git",
+    ".hg",
+    ".svn",
+    ".vs",
+    ".vscode",
+    "build",
+    "builds",
+    "library",
+    "logs",
+    "obj",
+    "temp",
+    "usersettings",
+}
+
 
 @dataclasses.dataclass
 class UnityEntry:
@@ -114,16 +129,30 @@ def rel(path: Path, root: Path) -> str:
 
 def build_guid_map(project_root: Path) -> dict[str, str]:
     guid_map: dict[str, str] = {}
-    for meta_path in project_root.rglob("*.meta"):
+    pending = [project_root]
+    while pending:
+        current = pending.pop()
         try:
-            text = read_text(meta_path)
+            children = list(current.iterdir())
         except OSError:
             continue
-        match = re.search(r"(?m)^guid:\s*([0-9a-fA-F]+)\s*$", text)
-        if not match:
-            continue
-        target = meta_path.with_suffix("")
-        guid_map[match.group(1).lower()] = rel(target if target.exists() else meta_path, project_root)
+        for child in children:
+            if child.is_dir():
+                if child.name.lower() not in SKIP_GUID_SCAN_DIRS:
+                    pending.append(child)
+                continue
+            if child.suffix != ".meta":
+                continue
+            meta_path = child
+            try:
+                text = read_text(meta_path)
+            except OSError:
+                continue
+            match = re.search(r"(?m)^guid:\s*([0-9a-fA-F]+)\s*$", text)
+            if not match:
+                continue
+            target = meta_path.with_suffix("")
+            guid_map[match.group(1).lower()] = rel(target if target.exists() else meta_path, project_root)
     return guid_map
 
 

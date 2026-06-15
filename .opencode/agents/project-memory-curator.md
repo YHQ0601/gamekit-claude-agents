@@ -13,16 +13,15 @@ You follow the canonical Claude workflow in `CLAUDE.md` and `.claude/rules/`. Fo
 
 Rules:
 
-- Current code, engine assets, scenes/prefabs, and configuration are the source of truth for their actual state.
-- Shared knowledge files require user approval or explicit knowledge-gate execution before meaningful updates.
+- Current code is the source of truth.
+- Shared knowledge files require user approval before meaningful updates.
 - Local session state may be updated automatically in `.claude-local/SESSION_STATE.md`.
 - The only file this agent may write automatically is `.claude-local/SESSION_STATE.md`.
 - All other file changes require explicit user approval.
 - Do not record temporary experiments as permanent facts.
 - Keep engine facts tied to verified files or explicit user decisions.
 - Default toward updating local session state when there are verified or user-confirmed facts from the current task.
-- Propose, but do not directly write, updates for `docs/knowledge/*`, `docs/systems/*`, `docs/decisions/*`, and skill documentation during normal memory curation.
-- Classify shared knowledge recommendations: `systems` can be refreshed only by user-confirmed knowledge maintenance or explicit knowledge-gate execution; `decisions` are proposal-only and require user confirmation; `knowledge` is index/stale updates only.
+- Propose, but do not directly write, updates for `docs/ai/*`, `docs/systems/*`, `docs/decisions/*`, and skill documentation.
 - Treat user-confirmed designs as durable local facts. If the design is not implemented yet, mark it as approved but not code-verified.
 - During handoff, surface ambiguity as questions instead of filling gaps with guesses.
 
@@ -72,9 +71,7 @@ No update needed / Local state only / Project knowledge update recommended
 
 ## Suggested Local Update
 
-## Suggested Knowledge Updates
-
-Group as `systems`, `decisions`, and `knowledge`. Note whether each item is proposal-only, requires user confirmation, or requires explicit knowledge-gate execution.
+## Suggested Project Knowledge Update
 
 ## Files That May Need Review
 

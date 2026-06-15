@@ -93,8 +93,8 @@ Adapter files intentionally repeat small role summaries so each tool can discove
 - `.claude/hooks/`：会话启动和用户 prompt 路由提示。
 - `.codex/`: Codex project agents, config, and hook adapters.
 - `.codex/`：Codex 项目 agents、配置和 hook 适配。
-- `.agents/skills/`: Codex wrapper skills that point back to canonical `.claude/skills/`.
-- `.agents/skills/`：Codex wrapper skills，指回主流程 `.claude/skills/`。
+- `.agents/skills/`: agent-compatible adapter skills that point back to canonical `.claude/skills/`.
+- `.agents/skills/`：agent-compatible adapter skills，指回主流程 `.claude/skills/`。
 - `.opencode/` and `opencode.json`: opencode project agents and rule loading.
 - `.opencode/` 与 `opencode.json`：opencode 项目 agents 和规则加载配置。
 - `docs/knowledge/`: project brief and short knowledge index.
@@ -282,8 +282,8 @@ Codex 通过适配层跟随 Claude 工作流：
 - 读取 `AGENTS.md` 作为共享项目约定；
 - use `.codex/agents/*.toml` for mapped roles;
 - 使用 `.codex/agents/*.toml` 作为角色映射；
-- use `.agents/skills/codex-*/SKILL.md` wrapper skills;
-- 使用 `.agents/skills/codex-*/SKILL.md` wrapper skills；
+- use `.agents/skills/gamekit-*/SKILL.md` agent-compatible adapter skills;
+- 使用 `.agents/skills/gamekit-*/SKILL.md` agent-compatible adapter skills；
 - reuse `.claude/hooks/` through `.codex/hooks.json` when project hooks are trusted.
 - 在项目信任 hook 后，通过 `.codex/hooks.json` 复用 `.claude/hooks/`。
 
@@ -299,8 +299,8 @@ opencode 通过共享约定和项目 agents 跟随主流程：
 - 使用 `.opencode/agents/*.md` 作为角色映射；
 - use canonical `.claude/skills/*/SKILL.md` through Claude-compatible skill discovery when available;
 - 在支持 Claude-compatible skill discovery 时，直接使用 `.claude/skills/*/SKILL.md`；
-- `opencode.json` loads `CLAUDE.md`, shared core rules, and denies `codex-*` wrapper skills to avoid duplicates.
-- `opencode.json` 加载 `CLAUDE.md` 和共享核心规则，并禁用 `codex-*` wrapper skills，避免重复展示。
+- `opencode.json` loads `CLAUDE.md`, `AGENTS.md`, and shared core rules.
+- `opencode.json` 加载 `CLAUDE.md`、`AGENTS.md` 和共享核心规则。
 
 ## Task Cards / 任务卡
 
