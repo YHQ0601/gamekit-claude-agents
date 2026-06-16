@@ -29,6 +29,8 @@ Forbidden:
 
 Return only:
 
+Keep each section brief; use `None` for empty risk areas and expand only when the risk changes validation or next action.
+
 ## Checks Run
 
 ## Active Engine Profile

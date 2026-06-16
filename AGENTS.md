@@ -13,6 +13,7 @@ The current repository code is the source of truth. Project knowledge files are 
 - Unity prefab or scene mutation work should use `gamekit-unity-prefab-edit`; use `gamekit-unity-yaml-context` before reading raw serialized YAML. When mutation requires the Unity Editor backend and `Assets/Editor/AgentTools/PrefabEditTool.cs` is missing, install it from the skill template automatically.
 - Codex should read this `AGENTS.md`, use project agents from `.codex/agents/`, and use agent-compatible adapter skills from `.agents/skills/`.
 - opencode should read this `AGENTS.md`, use project agents from `.opencode/agents/`, and may discover canonical `.claude/skills/` through Claude-compatible skill discovery.
+- When working in `Assets/FutureBright`, every agent follows `Assets/FutureBright/CLAUDE.md` (Claude primary) and `Assets/FutureBright/AGENTS.md` (thin router). The locked framework contract is `docs/tasks/v21-futurebright-assets-migration/v21-contract.md`; identity/deps live in `Assets/FutureBright/futurebright.json`.
 
 If a tool cannot automatically delegate, route, or load a workflow exactly like Claude Code, the main agent should follow the same role instructions manually and say which automation is unavailable.
 
@@ -150,6 +151,7 @@ When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/template
 - Use subagents for noisy searches or broad investigation when supported.
 - Keep the main conversation focused on conclusions.
 - Do not paste long logs into final answers.
+- Report-style workflows should follow `.claude/rules/core/context-budget.md`: conclusion first, compact background, omit empty sections, and expand only for evidence or high-risk findings.
 
 ## Development Rules
 

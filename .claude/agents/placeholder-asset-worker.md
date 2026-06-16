@@ -39,6 +39,8 @@ Forbidden:
 
 Return only:
 
+Keep the placeholder summary compact; put only actionable artist or integration details in the response.
+
 ## Placeholder Assets
 
 ## Active Engine Profile

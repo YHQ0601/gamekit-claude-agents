@@ -17,7 +17,7 @@ Purpose: collect external evidence without filling the main conversation with se
 4. When official evidence is insufficient, use actively maintained and widely adopted community repositories or technical references.
 5. Record the research date, match evidence to the relevant version, and prefer recently updated sources for fast-changing topics.
 6. One authoritative source may be enough for a clear fact. Cross-check recommendations, uncertain claims, and conflicting behavior.
-7. Return only evidence that can affect the parent workflow's decision.
+7. Return only evidence that can affect the parent workflow's decision, with a short implication instead of a broad literature dump.
 
 If web search is unavailable, report the blocker. Do not present an unverified answer as researched evidence.
 

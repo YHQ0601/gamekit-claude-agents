@@ -60,6 +60,8 @@ For `Unclear / Ask Before Continuing`, capture missing user decisions, unresolve
 
 Return only:
 
+Keep suggested updates compact and fact-based. Do not repeat the full conversation unless handoff continuity requires it.
+
 ## Memory Update Decision
 
 No update needed / Local state only / Project knowledge update recommended

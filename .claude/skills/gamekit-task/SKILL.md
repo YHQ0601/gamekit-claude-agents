@@ -20,6 +20,7 @@ Purpose: manage parent/child task cards under `docs/tasks/` as executable work o
 9. Preserve unknown facts as `TBD`.
 10. When claiming, closing, or blocking a task, run a `project-memory-curator` memory update decision so local session state reflects task status, validation status, and any open questions.
 11. Return a short task summary, changed files, and executor guidance. Do not duplicate long milestone background in the workflow response.
+12. Omit empty optional sections in the response; keep detailed execution context inside the task cards, not the chat reply.
 
 ## Guardrails
 

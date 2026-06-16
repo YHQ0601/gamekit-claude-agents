@@ -16,7 +16,7 @@ Purpose: decide the safest small implementation path before work starts. This wo
 5. Add Planning Notes when the task is ambiguous, multi-file, multi-system, serialized-data-heavy, architecture-sensitive, task-splitting work, or when the user asks about reuse, cleanup, better approaches, alternatives, or risk. Use targeted repository inspection before broad scanning.
 6. Keep simple bug fixes and small explicit tasks light: Planning Notes may be one short line and the plan may recommend going directly to `gamekit-build`.
 7. If the user asks for official guidance, references, latest/current practice, community practice, literature, or evidence-backed advice, use `gamekit-research` for evidence and `gamekit-ask` for the recommendation; then return to `gamekit-plan` only if scope, workstreams, or start decision are still unclear.
-8. Identify the smallest useful slice.
+8. Identify the smallest useful slice and its acceptance signals.
 9. Choose required workstreams and decide whether subagents are useful. Simple work should stay local.
 10. If risks are high, several approaches are close, or the approach depends on third-party APIs, plugins, performance conventions, or uncertain architecture practice, use `gamekit-research` when external evidence is needed, then `gamekit-ask` or read-only `architecture-reviewer` before implementation.
 11. Choose validation depth for the eventual work. Do not default every plan to `gamekit-check`; recommend it only when risk, user intent, or the affected surface warrants it.
@@ -50,6 +50,14 @@ Alternative:
 Risk Sources:
 
 ## Smallest Useful Slice
+
+Slice:
+
+Acceptance Signals:
+
+Out of Scope:
+
+Use 1-4 observable acceptance signals that tell an implementer and reviewer what "done" means. Do not turn this into a full test plan; keep detailed validation in `Validation Depth`.
 
 ## Workstreams / Subagents
 

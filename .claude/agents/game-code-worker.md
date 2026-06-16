@@ -30,6 +30,8 @@ Forbidden:
 
 Return only:
 
+Keep the implementation summary brief; summarize checks and risks instead of pasting logs.
+
 ## Files Changed
 
 ## Active Engine Profile

@@ -20,6 +20,7 @@ Use this workflow when the user wants better thinking about implementation shape
 7. Evaluate tradeoffs across compatibility, coupling, stability/regression, performance, production cost, and testability.
 8. Recommend one approach and state when to use `gamekit-plan`, `gamekit-build`, `gamekit-check`, `gamekit-review`, or `gamekit-task` next.
 9. If the question is architecture-sensitive, use read-only `architecture-reviewer` only when the active tool supports agents and the user's request already authorizes that workflow; otherwise recommend it. Do not use implementation workers from `gamekit-ask` alone.
+10. Keep the answer conclusion-first and compact; expand only on tradeoffs that change the recommendation.
 
 ## Boundaries
 

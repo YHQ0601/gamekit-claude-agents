@@ -26,6 +26,7 @@ Review:
 9. Apply the canonical Maintainability Lens and Finding Quality Gate in `REVIEW.md`.
 10. Report missing tests or manual checks only when they hide a concrete risk.
 11. Provide a short review summary, per-finding fix plans, and validation recommendations for actionable findings.
+12. Keep detail in actionable findings; do not expand summary sections when there are no concrete risks.
 
 Forbidden:
 
@@ -41,6 +42,8 @@ Forbidden:
 Return only:
 
 ## Review Summary
+
+Purpose:
 
 Scope:
 

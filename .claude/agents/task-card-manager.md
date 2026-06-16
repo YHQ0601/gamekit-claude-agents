@@ -45,6 +45,8 @@ Task card quality checklist:
 
 Return only:
 
+Keep the chat response short; put detailed executor context in the task cards, not in the reply.
+
 ## Task Card Decision
 
 ✅ Created / ✅ Updated / ✅ Split / ⛔ Blocked / ➖ No change needed

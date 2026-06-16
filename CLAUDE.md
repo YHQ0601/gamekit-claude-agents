@@ -159,9 +159,14 @@ When creating or refreshing `.claude-local/SESSION_STATE.md`, use `docs/template
 - Before review or QA, identify changed files, affected systems, active engine profile, and likely serialization/reference/build risks.
 - Code review is manual-only. Do not automatically review every implementation or edit files while reviewing. If the user asks to fix review findings, return to the main development workflow.
 - After code changes, run or propose the smallest relevant verification.
+- Report-style workflow responses should follow `.claude/rules/core/context-budget.md`: conclusion first, compact background, omit empty sections, and expand only for evidence or high-risk findings.
 
 ## Cross-Tool Compatibility
 
 This Claude Code workflow remains primary. The repository also provides `AGENTS.md`, `.codex/`, `.agents/skills/`, `.opencode/`, and `opencode.json` as adapter layers so Codex and opencode can follow the same workflow as closely as their native capabilities allow.
 
 Do not treat adapter files as replacements for `.claude/settings.json`, `.claude/agents/`, `.claude/skills/`, `.claude/commands/`, `.claude/rules/`, or `.claude/hooks/`.
+
+## FutureBright Framework
+
+`Assets/FutureBright` is a project-owned source framework (not a UPM package). When working inside it, follow `@Assets/FutureBright/CLAUDE.md` (primary framework rules) and `@Assets/FutureBright/AGENTS.md` (cross-agent thin router). Locked contract: `docs/tasks/v21-futurebright-assets-migration/v21-contract.md`; identity/deps: `Assets/FutureBright/futurebright.json`. Dependency direction is one-way `Game -> FutureBright`; the framework must not reference game/SDK/DOTween/Cinemachine/ES3 code.

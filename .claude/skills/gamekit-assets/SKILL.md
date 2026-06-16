@@ -17,7 +17,7 @@ Purpose: produce profile-aware placeholder assets or a placeholder asset plan wi
 6. Add stable replacement anchors.
 7. Include artist replacement notes, cleanup/replacement checklist, and validation steps.
 8. If the request also needs UnitDef, ScriptableObject, prefab, scene, config, or gameplay wiring, write the required handoff in `Integration Notes` and return to `gamekit-build`; do not decide gameplay wiring inside the asset workflow.
-9. Keep the asset purpose short and concrete so the result can be forwarded to another agent or artist for review.
+9. Keep the asset purpose and handoff short and concrete so the result can be forwarded to another agent or artist for review.
 
 ## Output Format
 

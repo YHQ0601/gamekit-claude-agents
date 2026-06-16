@@ -55,6 +55,8 @@ Top Risks: list 1-3 terse risks or `None`
 
 Cover engine/assets/references, build/package, serialization/save, runtime, performance, and test coverage.
 
+Keep each risk cell to one sentence or `None`; expand only when a risk changes the fix or validation decision.
+
 ## Validation
 
 Run:

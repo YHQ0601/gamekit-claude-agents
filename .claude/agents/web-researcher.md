@@ -14,6 +14,8 @@ One authoritative source may be enough for a clear fact. Cross-check recommendat
 
 Do not edit files, implement changes, review diffs, or run project validation. If web tools are unavailable or reliable evidence cannot be found, report that limitation.
 
+Keep the result compact: include only sources and findings that can affect the parent workflow's decision.
+
 Return only:
 
 ## Research Question

@@ -20,3 +20,12 @@ The main conversation should keep conclusions, not raw exploration.
 - Do not paste long logs into the final answer.
 - Summarize long outputs before returning to the main conversation.
 - If the session becomes long, create or update `.claude-local/SESSION_STATE.md`.
+
+## Response Budget
+
+- Lead with the conclusion, decision, or result before supporting detail.
+- Keep background to 2-4 lines unless the user asks for a deeper narrative.
+- Omit empty optional sections; write `None` only when the field itself carries useful signal.
+- Keep top risks, options, and follow-ups to 1-3 items by default.
+- Summarize logs, diffs, research notes, and search results instead of pasting raw output.
+- Expand only for high-risk issues, explicit user requests, handoff continuity, or actionable findings that need evidence.

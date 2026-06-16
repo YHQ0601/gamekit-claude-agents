@@ -20,6 +20,8 @@ Evaluate:
 
 Return only:
 
+Keep the verdict concise; expand only on risks that change the implementation decision.
+
 ## Verdict
 
 Accept / Simplify / Reject
